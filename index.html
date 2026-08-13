@@ -547,10 +547,10 @@
               <p class="eyebrow">Explorar</p>
               <h3 id="swipeTitle" style="margin-bottom:14px;">Personas reales cerca de ti</h3>
             </div>
-            <button onclick="openAccountScreen()" title="Mi cuenta" aria-label="Mi cuenta" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
+            <button onclick="openAccountScreen()" title="Mi cuenta" aria-label="Mi cuenta" style="background:linear-gradient(180deg,var(--gold-bright),var(--gold)); border:none; border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none; box-shadow:0 2px 8px rgba(201,161,90,.35);">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="3.4" stroke="#e6c988" stroke-width="1.7"/>
-                <path d="M5 20 C 5 15.5, 8 13, 12 13 C 16 13, 19 15.5, 19 20" stroke="#e6c988" stroke-width="1.7" stroke-linecap="round"/>
+                <circle cx="12" cy="8" r="3.4" stroke="#0c1830" stroke-width="1.9"/>
+                <path d="M5 20 C 5 15.5, 8 13, 12 13 C 16 13, 19 15.5, 19 20" stroke="#0c1830" stroke-width="1.9" stroke-linecap="round"/>
               </svg>
             </button>
           </div>
@@ -636,6 +636,27 @@
               <option value="todos">Buscando a todos</option>
             </select>
             <textarea class="field" placeholder="Tu bio…" id="acctBio" style="resize:none; height:70px;"></textarea>
+            <input class="field" type="text" placeholder="¿A qué te dedicas?" id="acctOccupation">
+            <input class="field" type="text" placeholder="Tus intereses (ej. senderismo, cocina, música)" id="acctInterests">
+            <select class="field" id="acctHasKids">
+              <option value="" disabled selected>¿Tienes hijos?</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+              <option value="prefiero_no_decir">Prefiero no decir</option>
+            </select>
+            <select class="field" id="acctHasPets">
+              <option value="" disabled selected>¿Tienes mascotas?</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select>
+            <select class="field" id="acctLivingSituation">
+              <option value="" disabled selected>Situación de vivienda</option>
+              <option value="solo">Vivo solo/a</option>
+              <option value="con_pareja">Vivo con mi pareja</option>
+              <option value="con_familia">Vivo con familia</option>
+              <option value="con_roommates">Vivo con roommates</option>
+              <option value="prefiero_no_decir">Prefiero no decir</option>
+            </select>
             <button type="button" class="btn ghost small" onclick="useMyLocation()" style="width:100%; margin-bottom:8px;">📍 Actualizar mi ubicación</button>
             <p id="acctLocationLabel" style="font-size:12px; color:#aab6c9; margin:0 0 12px 0;"></p>
             <p id="acctError" style="color:#e08a8a; font-size:12px; margin:-6px 0 12px 0; display:none;"></p>
@@ -1290,6 +1311,11 @@ async function openAccountScreen(){
     document.getElementById('acctName').value = data.name || '';
     document.getElementById('acctGenderPref').value = data.gender_preference || 'todos';
     document.getElementById('acctBio').value = data.bio || '';
+    document.getElementById('acctOccupation').value = data.occupation || '';
+    document.getElementById('acctInterests').value = data.interests || '';
+    document.getElementById('acctHasKids').value = data.has_kids || '';
+    document.getElementById('acctHasPets').value = data.has_pets || '';
+    document.getElementById('acctLivingSituation').value = data.living_situation || '';
     document.getElementById('acctLocationLabel').textContent = data.city ? `📍 ${data.city}` : 'Ubicación no configurada';
 
     const badge = document.getElementById('accountVerifiedLine');
@@ -1327,6 +1353,11 @@ async function saveAccountChanges(){
   const name = document.getElementById('acctName').value.trim();
   const gender_preference = document.getElementById('acctGenderPref').value;
   const bio = document.getElementById('acctBio').value.trim();
+  const occupation = document.getElementById('acctOccupation').value.trim();
+  const interests = document.getElementById('acctInterests').value.trim();
+  const has_kids = document.getElementById('acctHasKids').value;
+  const has_pets = document.getElementById('acctHasPets').value;
+  const living_situation = document.getElementById('acctLivingSituation').value;
 
   if(!name){
     showError('acctError', 'Tu nombre no puede quedar vacío.');
@@ -1338,7 +1369,7 @@ async function saveAccountChanges(){
   btn.textContent = 'Guardando…';
 
   try {
-    const body = { name, gender_preference, bio };
+    const body = { name, gender_preference, bio, occupation, interests, has_kids, has_pets, living_situation };
     if(pickedLat && pickedLng){
       body.latitude = pickedLat;
       body.longitude = pickedLng;
