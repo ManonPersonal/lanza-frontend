@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -544,8 +542,18 @@
 
         <!-- Screen 7: Swipe deck -->
         <div class="screen" id="s7" style="padding-top:14px;">
-          <p class="eyebrow">Explorar</p>
-          <h3 id="swipeTitle" style="margin-bottom:14px;">Personas reales cerca de ti</h3>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <p class="eyebrow">Explorar</p>
+              <h3 id="swipeTitle" style="margin-bottom:14px;">Personas reales cerca de ti</h3>
+            </div>
+            <button onclick="openAccountScreen()" title="Mi cuenta" aria-label="Mi cuenta" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:50%; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="3.4" stroke="#e6c988" stroke-width="1.7"/>
+                <path d="M5 20 C 5 15.5, 8 13, 12 13 C 16 13, 19 15.5, 19 20" stroke="#e6c988" stroke-width="1.7" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
           <div id="swipeArea" style="flex:1; display:flex; flex-direction:column; position:relative; overflow:visible;">
             <div id="candidateCard" style="flex:1; border-radius:22px; overflow:hidden; position:relative; background:linear-gradient(160deg, var(--navy-mid), var(--navy-deep)); border:1px solid var(--navy-line); box-shadow:0 18px 40px rgba(0,0,0,.35); display:flex; align-items:flex-end; min-height:340px;">
               <img id="candidatePhoto" src="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;">
@@ -595,6 +603,48 @@
             </div>
           </div>
           <p id="matchNotice" style="text-align:center; color:var(--gold-bright); font-size:13px; margin-top:10px; display:none;">✨ ¡Es un match!</p>
+        </div>
+
+        <!-- Screen 8: Account / Settings -->
+        <div class="screen" id="s8">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+            <button onclick="goTo(7)" title="Volver" aria-label="Volver" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5 L8 12 L15 19" stroke="#e6c988" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <p class="eyebrow" style="margin:0;">Mi cuenta</p>
+          </div>
+
+          <div id="accountLoading" style="text-align:center; color:#8291a8; font-size:13px; padding:30px 0;">Cargando tu perfil…</div>
+
+          <div id="accountContent" style="display:none;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+              <div id="accountPhotoWrap" style="width:58px; height:58px; border-radius:50%; overflow:hidden; background:var(--navy-mid); border:1px solid var(--navy-line); flex:none; display:flex; align-items:center; justify-content:center;">
+                <img id="accountPhoto" style="width:100%; height:100%; object-fit:cover; display:none;">
+                <span id="accountPhotoFallback" style="font-size:20px; color:var(--gold-bright);">👤</span>
+              </div>
+              <div>
+                <div id="accountName" style="font-family:'Playfair Display',serif; font-size:18px; color:var(--cream);"></div>
+                <div id="accountVerifiedLine" style="font-size:11.5px; color:var(--gold-bright); margin-top:2px;">✓ Identidad verificada</div>
+              </div>
+            </div>
+
+            <p class="eyebrow" style="margin-top:6px;">Editar perfil</p>
+            <input class="field" type="text" placeholder="Tu nombre" id="acctName">
+            <select class="field" id="acctGenderPref">
+              <option value="mujer">Buscando mujeres</option>
+              <option value="hombre">Buscando hombres</option>
+              <option value="todos">Buscando a todos</option>
+            </select>
+            <textarea class="field" placeholder="Tu bio…" id="acctBio" style="resize:none; height:70px;"></textarea>
+            <button type="button" class="btn ghost small" onclick="useMyLocation()" style="width:100%; margin-bottom:8px;">📍 Actualizar mi ubicación</button>
+            <p id="acctLocationLabel" style="font-size:12px; color:#aab6c9; margin:0 0 12px 0;"></p>
+            <p id="acctError" style="color:#e08a8a; font-size:12px; margin:-6px 0 12px 0; display:none;"></p>
+            <button class="btn primary" id="acctSaveBtn" onclick="saveAccountChanges()">Guardar cambios</button>
+
+            <div style="margin-top:24px; padding-top:18px; border-top:1px solid var(--navy-line);">
+              <button class="btn ghost" style="width:100%; color:#e08a8a; border-color:rgba(224,138,138,.3);" onclick="logOut()">Cerrar sesión</button>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1222,6 +1272,107 @@ async function swipeAction(direction){
     candidateIndex += 1;
     renderCandidate();
   }, animDelay);
+}
+
+// ---- Account / Settings ----
+async function openAccountScreen(){
+  goTo(8);
+  document.getElementById('accountLoading').style.display = 'block';
+  document.getElementById('accountContent').style.display = 'none';
+  hideError('acctError');
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}`);
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'No se pudo cargar tu perfil.');
+
+    document.getElementById('accountName').textContent = data.name || 'Sin nombre';
+    document.getElementById('acctName').value = data.name || '';
+    document.getElementById('acctGenderPref').value = data.gender_preference || 'todos';
+    document.getElementById('acctBio').value = data.bio || '';
+    document.getElementById('acctLocationLabel').textContent = data.city ? `📍 ${data.city}` : 'Ubicación no configurada';
+
+    const badge = document.getElementById('accountVerifiedLine');
+    badge.textContent = data.identity_verified ? '✓ Identidad verificada' : 'Identidad pendiente de verificación';
+    badge.style.color = data.identity_verified ? 'var(--gold-bright)' : '#8291a8';
+
+    const photo = document.getElementById('accountPhoto');
+    const fallback = document.getElementById('accountPhotoFallback');
+    if(data.photos && data.photos.length){
+      photo.src = data.photos[0].url;
+      photo.style.display = 'block';
+      fallback.style.display = 'none';
+    } else {
+      photo.style.display = 'none';
+      fallback.style.display = 'block';
+    }
+
+    // Keep the shared location state in sync so "Actualizar mi ubicación"
+    // and saving reuse the same real coordinates as the profile screen.
+    if(data.latitude && data.longitude){
+      pickedLat = data.latitude;
+      pickedLng = data.longitude;
+      pickedCity = data.city || '';
+    }
+
+    document.getElementById('accountLoading').style.display = 'none';
+    document.getElementById('accountContent').style.display = 'block';
+  } catch(err){
+    document.getElementById('accountLoading').textContent = err.message || 'Algo salió mal.';
+  }
+}
+
+async function saveAccountChanges(){
+  hideError('acctError');
+  const name = document.getElementById('acctName').value.trim();
+  const gender_preference = document.getElementById('acctGenderPref').value;
+  const bio = document.getElementById('acctBio').value.trim();
+
+  if(!name){
+    showError('acctError', 'Tu nombre no puede quedar vacío.');
+    return;
+  }
+
+  const btn = document.getElementById('acctSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  try {
+    const body = { name, gender_preference, bio };
+    if(pickedLat && pickedLng){
+      body.latitude = pickedLat;
+      body.longitude = pickedLng;
+      body.city = pickedCity;
+    }
+
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'No se pudo guardar.');
+
+    document.getElementById('accountName').textContent = data.name;
+    document.getElementById('acctLocationLabel').textContent = data.city ? `📍 ${data.city}` : 'Ubicación no configurada';
+    btn.textContent = '✓ Guardado';
+    setTimeout(() => { btn.textContent = 'Guardar cambios'; }, 1500);
+  } catch(err){
+    showError('acctError', err.message || 'Algo salió mal. Intenta de nuevo.');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function logOut(){
+  currentUserId = null;
+  currentPhone = null;
+  candidates = [];
+  candidateIndex = 0;
+  pickedLat = null;
+  pickedLng = null;
+  pickedCity = '';
+  restartFlow();
 }
 
 setProgress(0);
