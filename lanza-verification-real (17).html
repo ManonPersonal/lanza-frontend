@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lanza — Verificación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital@1&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --navy-deep:#0c1830;
+    --navy-mid:#152847;
+    --navy-line:#26395c;
+    --gold:#c9a15a;
+    --gold-bright:#e6c988;
+    --gold-dim:#8a6f3d;
+    --cream:#f4eee1;
+    --cream-dim:#e7ddc7;
+    --ink:#221c12;
+    --ink-soft:#5b5142;
+    --rose:#b5563f;
+    --green:#4c9468;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:radial-gradient(ellipse at 50% -10%, #1c3157 0%, var(--navy-deep) 55%), var(--navy-deep);
+    font-family:'Inter',sans-serif;
+    display:flex; align-items:center; justify-content:center;
+    padding:32px 16px; color:var(--cream);
+  }
+  .stage{
+    width:100%; max-width:1040px;
+    display:flex; gap:56px; align-items:flex-start; justify-content:center; flex-wrap:wrap;
+  }
+  .intro{max-width:320px; padding-top:36px;}
+  .wordmark{
+    font-family:'Playfair Display',serif; font-weight:800; font-size:44px; letter-spacing:1px;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold) 55%,var(--gold-dim));
+    -webkit-background-clip:text; background-clip:text; color:transparent; margin:0 0 6px 0;
+  }
+  .tagline{font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px; color:var(--cream-dim); margin:0 0 28px 0; line-height:1.4;}
+  .intro h2{font-family:'Playfair Display',serif; font-size:17px; letter-spacing:.04em; margin:0 0 10px 0; color:var(--gold-bright);}
+  .intro p{font-size:14.5px; line-height:1.65; color:#c7cfdd; margin:0 0 22px 0;}
+  .steps-legend{display:flex; flex-direction:column; gap:14px; border-top:1px solid var(--navy-line); padding-top:20px;}
+  .sl-row{display:flex; gap:12px; align-items:flex-start;}
+  .sl-icon{width:30px;height:30px;flex:none;border-radius:50%; display:flex;align-items:center;justify-content:center; background:var(--navy-mid); border:1px solid var(--navy-line); font-size:13px; color:var(--gold-bright); font-weight:600;}
+  .sl-text{font-size:13px;color:#aab6c9;line-height:1.5;padding-top:4px;}
+  .sl-text b{color:var(--cream);font-weight:600;}
+
+  .phone-wrap{position:relative;}
+  .phone{
+    width:340px; height:680px;
+    background:linear-gradient(180deg,var(--navy-mid),#0f1e38);
+    border-radius:38px; border:1px solid var(--navy-line);
+    box-shadow:0 0 0 8px #081222, 0 30px 60px -20px rgba(0,0,0,.7), inset 0 0 40px rgba(201,161,90,.05);
+    position:relative; overflow:hidden; display:flex; flex-direction:column;
+  }
+  .phone::before{content:""; position:absolute; top:14px; left:50%; transform:translateX(-50%); width:70px; height:5px; border-radius:3px; background:rgba(201,161,90,.35);}
+
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:30px 22px 6px 22px;}
+  .topbar .mark{font-family:'Playfair Display',serif; font-weight:800; font-size:17px; color:var(--gold-bright); letter-spacing:.5px;}
+  .step-count{font-size:10.5px; color:#8291a8; letter-spacing:.04em;}
+
+  .progress{display:flex; gap:6px; padding:14px 22px 18px 22px;}
+  .progress .seg{flex:1; height:3px; border-radius:3px; background:var(--navy-line); overflow:hidden;}
+  .progress .seg i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--gold-bright)); transition:width .4s ease;}
+
+  .screens{flex:1; position:relative; overflow:hidden;}
+  .screen{
+    position:absolute; inset:0; padding:8px 24px 20px 24px;
+    display:flex; flex-direction:column;
+    opacity:0; transform:translateX(24px); pointer-events:none;
+    transition:opacity .35s ease, transform .35s ease;
+    overflow-y:auto;
+  }
+  .screen.active{opacity:1; transform:translateX(0); pointer-events:auto;}
+
+  .eyebrow{font-size:10.5px; letter-spacing:.1em; color:var(--gold-bright); text-transform:uppercase; margin:0 0 8px 0;}
+  .screen h3{font-family:'Playfair Display',serif; font-size:21px; margin:0 0 8px 0; color:var(--cream);}
+  .screen .desc{font-size:13px; color:#aab6c9; line-height:1.55; margin:0 0 22px 0;}
+
+  .icon-hero{
+    width:76px;height:76px;border-radius:50%; margin:6px auto 18px auto;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(201,161,90,.1); border:1px solid rgba(201,161,90,.35);
+  }
+
+  input.field, select.field, textarea.field{
+    width:100%; background:rgba(244,238,225,.06); border:1px solid var(--navy-line);
+    color:var(--cream); font-size:15px; padding:13px 14px; border-radius:12px;
+    font-family:'Inter',sans-serif; outline:none; margin-bottom:12px;
+  }
+  input.field:focus, select.field:focus, textarea.field:focus{border-color:var(--gold);}
+  input.field::placeholder, textarea.field::placeholder{color:#6c7994;}
+  select.field{
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a15a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; padding-right:36px;
+  }
+  select.field option{background:var(--navy-mid); color:var(--cream);}
+
+  .otp-row{display:flex; gap:9px; margin-bottom:16px;}
+  .otp-row input{
+    width:100%; aspect-ratio:1/1; text-align:center; font-size:19px; font-weight:600;
+    background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:10px;
+    color:var(--gold-bright); outline:none;
+  }
+  .otp-row input:focus{border-color:var(--gold);}
+
+  .cam-frame{
+    flex:1; border-radius:18px; border:1.5px dashed var(--gold-dim);
+    background:repeating-linear-gradient(135deg, rgba(201,161,90,.05) 0 10px, rgba(201,161,90,.02) 10px 20px);
+    display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+    min-height:200px; margin-bottom:16px;
+  }
+  .id-card-outline{
+    width:82%; aspect-ratio:1.58/1; border:2px solid var(--gold); border-radius:10px;
+    position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:6px;
+  }
+  .id-card-outline .cedula-label{font-size:10px; letter-spacing:.08em; color:var(--gold-bright); text-transform:uppercase;}
+  .id-card-outline .cedula-lines{width:60%; display:flex; flex-direction:column; gap:5px;}
+  .id-card-outline .cedula-lines div{height:5px; border-radius:2px; background:rgba(230,201,136,.25);}
+  .corner{position:absolute; width:18px; height:18px; border-color:var(--gold-bright);}
+  .corner.tl{top:8px; left:8px; border-top:2.5px solid; border-left:2.5px solid; border-radius:4px 0 0 0;}
+  .corner.tr{top:8px; right:8px; border-top:2.5px solid; border-right:2.5px solid; border-radius:0 4px 0 0;}
+  .corner.bl{bottom:8px; left:8px; border-bottom:2.5px solid; border-left:2.5px solid; border-radius:0 0 0 4px;}
+  .corner.br{bottom:8px; right:8px; border-bottom:2.5px solid; border-right:2.5px solid; border-radius:0 0 4px 0;}
+
+  .face-rope-timer{
+    position:relative; width:150px; height:150px;
+  }
+  .face-rope-timer svg{ transform:rotate(-90deg); }
+  .face-rope-center{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  }
+  .face-rope-center .glyph{ font-size:40px; color:rgba(230,201,136,.55); transition:opacity .3s ease; }
+  .face-rope-center .glyph.hide{ opacity:0; }
+  .face-rope-center .done-icon{ position:absolute; opacity:0; transform:scale(.6); transition:opacity .3s ease, transform .3s ease; }
+  .face-rope-center .done-icon.show{ opacity:1; transform:scale(1); }
+  .scan-caption-static{ text-align:center; font-size:11.5px; color:var(--gold-bright); letter-spacing:.04em; margin:14px 0 0 0; }
+
+  .scan-caption{position:absolute; bottom:14px; left:0; right:0; text-align:center; font-size:11px; color:var(--gold-bright); letter-spacing:.04em;}
+
+  .checkmark-pop{
+    width:100%; text-align:center; padding:16px 0 6px 0; opacity:0; transform:scale(.7);
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .checkmark-pop.show{opacity:1; transform:scale(1);}
+  .checkmark-pop .circle{
+    width:46px;height:46px;border-radius:50%; margin:0 auto 8px auto;
+    background:linear-gradient(180deg,var(--gold-bright),var(--gold));
+    display:flex;align-items:center;justify-content:center; color:#1c1608; font-size:22px; font-weight:700;
+  }
+  .checkmark-pop p{margin:0; font-size:12.5px; color:#aab6c9;}
+
+  .btn{
+    width:100%; padding:14px 0; border-radius:26px; border:none; cursor:pointer;
+    font-weight:600; font-size:14px; letter-spacing:.02em; font-family:'Inter',sans-serif;
+  }
+  .btn.primary{background:linear-gradient(180deg,var(--gold-bright),var(--gold)); color:#1c1608;}
+  .btn.primary:disabled{opacity:.4; cursor:not-allowed;}
+  .btn.ghost{background:none; border:1px solid var(--navy-line); color:#aab6c9; margin-top:10px;}
+  .btn.small{padding:11px 0; font-size:13px;}
+
+  .footer-actions{margin-top:auto; padding-top:14px;}
+  .resend{text-align:center; font-size:12px; color:#8291a8; margin-top:12px;}
+  .resend b{color:var(--gold-bright); cursor:pointer; font-weight:600;}
+
+  .review-wrap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+  .review-wrap .clock{
+    width:70px;height:70px;border-radius:50%; margin-bottom:18px;
+    background:rgba(201,161,90,.1); border:1px solid rgba(201,161,90,.35);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .review-wrap h3{font-family:'Playfair Display',serif; font-size:20px; margin:0 0 8px 0;}
+  .review-wrap p{font-size:13px; color:#aab6c9; line-height:1.6; margin:0 0 22px 0; max-width:250px;}
+  .review-list{width:100%; text-align:left; background:rgba(244,238,225,.05); border:1px solid var(--navy-line); border-radius:14px; padding:14px 16px; margin-bottom:22px;}
+  .review-list .ri{display:flex; align-items:center; gap:10px; font-size:12.5px; color:#c7cfdd; padding:6px 0;}
+  .review-list .ri .dot{width:16px;height:16px;border-radius:50%; background:var(--green); flex:none; display:flex;align-items:center;justify-content:center; font-size:9px; color:#0c1830; font-weight:700;}
+
+  .countdown{
+    font-family:'Playfair Display',serif; font-size:26px; font-weight:700;
+    color:var(--gold-bright); letter-spacing:.02em; font-variant-numeric:tabular-nums;
+  }
+  .countdown-label{
+    font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:#8291a8; margin-top:3px;
+  }
+  .rope-timer{
+    position:relative; width:132px; height:132px; margin:2px auto 18px auto;
+  }
+  .rope-timer svg{ transform:rotate(-90deg); }
+  .rope-base{
+    fill:none; stroke:rgba(201,161,90,.16); stroke-width:8; stroke-linecap:round;
+    stroke-dasharray:4.5 4.5; /* twisted-rope texture */
+  }
+  .rope-progress{
+    fill:none; stroke:var(--gold-bright); stroke-width:8; stroke-linecap:round;
+    stroke-dasharray:339.292 339.292; stroke-dashoffset:339.292;
+    transition:stroke-dashoffset .15s linear, stroke .3s ease;
+    filter:drop-shadow(0 0 5px rgba(230,201,136,.55));
+  }
+  #selfieRing{ stroke-dasharray:402.12 402.12; stroke-dashoffset:402.12; }
+  .rope-progress.complete{ animation:ropePulse 1s ease-in-out infinite; }
+  @keyframes ropePulse{
+    0%,100%{ filter:drop-shadow(0 0 5px rgba(230,201,136,.55)); }
+    50%{ filter:drop-shadow(0 0 12px rgba(230,201,136,.9)); }
+  }
+  .rope-timer-center{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .rope-timer-center .done-icon{ opacity:0; transform:scale(.6); transition:opacity .3s ease, transform .3s ease; }
+  .rope-timer-center .done-icon.show{ opacity:1; transform:scale(1); }
+  .privacy-note{
+    font-size:11px; color:#8291a8; line-height:1.55; margin:0 0 20px 0; max-width:250px;
+  }
+
+  .approved-wrap{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;}
+  .badge-hero{
+    width:96px;height:96px;border-radius:50%; margin-bottom:20px;
+    background:radial-gradient(circle at 35% 30%, var(--gold-bright), var(--gold) 60%, var(--gold-dim));
+    display:flex; align-items:center; justify-content:center; font-size:40px; color:#1c1608;
+    box-shadow:0 0 0 10px rgba(201,161,90,.1);
+  }
+  .approved-wrap h3{font-family:'Playfair Display',serif; font-size:24px; margin:0 0 8px 0; color:var(--gold-bright);}
+  .approved-wrap p{font-size:13.5px; color:#c7cfdd; line-height:1.6; margin:0 0 26px 0; max-width:250px;}
+
+  .swipe-icon-btn{
+    width:58px; height:58px; border-radius:50%; border:1.5px solid var(--navy-line);
+    background:rgba(244,238,225,.06); display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:transform .15s ease, border-color .15s ease;
+  }
+  .swipe-icon-btn:active{transform:scale(.9);}
+  .swipe-icon-btn.small{width:42px; height:42px;}
+  .swipe-icon-btn.primary-icon{
+    background:linear-gradient(180deg,rgba(230,201,136,.18),rgba(201,161,90,.1));
+    border-color:var(--gold);
+  }
+  .swipe-icon-btn:hover{border-color:var(--gold);}
+
+  /* Pass animation: bat swings and knocks the ball off-screen */
+  @keyframes batSwing{
+    0%{transform:rotate(-35deg);}
+    35%{transform:rotate(25deg);}
+    100%{transform:rotate(25deg);}
+  }
+  @keyframes ballFly{
+    0%,30%{transform:translate(0,0) scale(1); opacity:1;}
+    100%{transform:translate(160px,-60px) scale(.4); opacity:0;}
+  }
+  .anim-bat{position:absolute; left:8px; bottom:0; font-size:26px; transform-origin:80% 90%; animation:batSwing .45s ease forwards;}
+  .anim-ball{position:absolute; left:36px; bottom:6px; font-size:18px; animation:ballFly .5s ease-out .12s forwards;}
+
+  /* Like animation: heart swings on a lasso rope then flies up */
+  @keyframes lassoSwing{
+    0%{transform:rotate(0deg) translateY(0);}
+    30%{transform:rotate(-18deg) translateY(-4px);}
+    60%{transform:rotate(14deg) translateY(-2px);}
+    100%{transform:rotate(0deg) translateY(-70px) scale(.6); opacity:0;}
+  }
+  .anim-heart{position:absolute; right:14px; bottom:10px; font-size:26px; transform-origin:50% -10px; animation:lassoSwing .7s ease forwards;}
+
+  /* Maybe animation: arrow shoots upward */
+  @keyframes arrowShoot{
+    0%{transform:translateY(0); opacity:1;}
+    100%{transform:translateY(-90px); opacity:0;}
+  }
+  .anim-arrow{position:absolute; left:50%; bottom:0; transform:translateX(-50%); font-size:22px; animation:arrowShoot .5s ease-out forwards;}
+
+  /* Pass: bat swings in from the left, connects with the ball
+     center-screen, then the card (and ball) fly off together */
+  @keyframes cardFlyPass{
+    0%{transform:translate(0,0) rotate(0deg); opacity:1;}
+    45%{transform:translate(0,0) rotate(0deg); opacity:1;}
+    100%{transform:translate(-340px,-80px) rotate(-30deg); opacity:0;}
+  }
+  #candidateCard.fly-pass{animation:cardFlyPass .7s cubic-bezier(.3,.6,.6,1) forwards;}
+
+  @keyframes batSwingCenter{
+    0%{transform:translate(-50%,-50%) rotate(70deg);}
+    45%{transform:translate(-50%,-50%) rotate(-15deg);}
+    60%{transform:translate(-50%,-50%) rotate(-15deg);}
+    100%{transform:translate(-50%,-50%) rotate(-15deg); opacity:0;}
+  }
+  @keyframes ballHit{
+    0%,44%{transform:translate(-50%,-50%) scale(1); opacity:1;}
+    100%{transform:translate(-180px,-180px) scale(.6); opacity:0;}
+  }
+  .anim-bat-center{
+    position:absolute; left:50%; top:50%; font-size:96px;
+    transform-origin:15% 85%; animation:batSwingCenter .7s ease forwards;
+    z-index:3;
+  }
+  .anim-ball-center{
+    position:absolute; left:50%; top:50%; font-size:52px;
+    animation:ballHit .7s cubic-bezier(.3,.6,.6,1) forwards;
+    z-index:3;
+  }
+
+  /* Like: card flies to the right as if pulled by the lasso */
+  @keyframes cardFlyLike{
+    0%{transform:translate(0,0) scale(1) rotate(0deg); opacity:1;}
+    35%{transform:translate(20px,-10px) scale(1.02) rotate(2deg); opacity:1;}
+    100%{transform:translate(340px,-40px) scale(.7) rotate(10deg); opacity:0;}
+  }
+  #candidateCard.fly-like{animation:cardFlyLike .65s ease-in forwards;}
+
+  @keyframes heartBurst{
+    0%{transform:translate(0,0) scale(.6); opacity:0;}
+    15%{transform:translate(0,0) scale(1.2); opacity:1;}
+    30%{opacity:1;}
+    100%{transform:var(--heart-end) scale(1.1); opacity:0;}
+  }
+  .heart-particle{position:absolute; font-size:20px; animation:heartBurst 1s ease-out forwards;}
+
+  @keyframes cardWobble{
+    0%,100%{transform:translate(0,0) rotate(0deg);}
+    25%{transform:translate(-6px,0) rotate(-2deg);}
+    50%{transform:translate(0,-4px) rotate(0deg);}
+    75%{transform:translate(6px,0) rotate(2deg);}
+  }
+  @keyframes cardDriftMaybe{
+    0%{transform:translate(0,0) rotate(0deg); opacity:1;}
+    100%{transform:translate(0,-200px) rotate(0deg); opacity:0;}
+  }
+  #candidateCard.wobble-maybe{animation:cardWobble .6s ease, cardDriftMaybe .8s ease .1s forwards;}
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="intro">
+    <div class="wordmark">Lanza</div>
+    <p class="tagline">"Te enseñamos a apuntar&hellip; el resto es cosa tuya."</p>
+    <h2>Por qué verificamos</h2>
+    <p>Antes de ver un solo perfil, confirmamos que cada persona es quien dice ser. Así, cuando aparece un match, sabes que es real.</p>
+    <div class="steps-legend">
+      <div class="sl-row"><div class="sl-icon">1</div><div class="sl-text"><b>Teléfono</b> — confirmamos tu número con un código real por SMS.</div></div>
+      <div class="sl-row"><div class="sl-icon">2</div><div class="sl-text"><b>Identificación</b> — escaneas tu cédula.</div></div>
+      <div class="sl-row"><div class="sl-icon">3</div><div class="sl-text"><b>Selfie</b> — una prueba rápida de que estás en vivo.</div></div>
+      <div class="sl-row"><div class="sl-icon">4</div><div class="sl-text"><b>Revisión</b> — comparamos todo y aprobamos tu perfil.</div></div>
+    </div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="topbar">
+        <div class="mark">Lanza</div>
+        <div class="step-count" id="stepCount">Paso 1 de 4</div>
+      </div>
+      <div class="progress">
+        <div class="seg"><i id="seg1"></i></div>
+        <div class="seg"><i id="seg2"></i></div>
+        <div class="seg"><i id="seg3"></i></div>
+        <div class="seg"><i id="seg4"></i></div>
+      </div>
+
+      <div class="screens">
+
+        <!-- Screen 0: Welcome -->
+        <div class="screen active" id="s0">
+          <p class="eyebrow">Antes de empezar</p>
+          <h3>Vamos a verificarte</h3>
+          <p class="desc">Toma unos 3 minutos. Es lo único que se interpone entre tú y perfiles reales, verificados uno por uno.</p>
+          <div class="icon-hero">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3 L20 6.5 V11.5 C20 16.5 16.5 20 12 21.5 C7.5 20 4 16.5 4 11.5 V6.5 Z" stroke="#e6c988" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+              <path d="M8.5 12 L11 14.5 L15.5 9.5" stroke="#e6c988" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="footer-actions">
+            <button class="btn primary" onclick="goTo(1)">Empezar verificación</button>
+          </div>
+        </div>
+
+        <!-- Screen 1: Phone + OTP -->
+        <div class="screen" id="s1">
+          <p class="eyebrow">Paso 1</p>
+          <h3>Confirma tu número</h3>
+          <p class="desc" id="phoneDesc">Un número, una cuenta. Te enviaremos un código de 4 dígitos.</p>
+
+          <div id="phoneEntry">
+            <input class="field" type="tel" placeholder="+1 809 000 0000" id="phoneInput">
+            <p id="phoneError" style="color:#e08a8a; font-size:12px; margin:-6px 0 12px 0; display:none;"></p>
+            <div class="footer-actions">
+              <button class="btn primary" id="sendCodeBtn" onclick="sendCode()">Enviar código</button>
+            </div>
+          </div>
+
+          <div id="otpEntry" style="display:none;">
+            <div class="otp-row">
+              <input maxlength="1" inputmode="numeric">
+              <input maxlength="1" inputmode="numeric">
+              <input maxlength="1" inputmode="numeric">
+              <input maxlength="1" inputmode="numeric">
+              <input maxlength="1" inputmode="numeric">
+              <input maxlength="1" inputmode="numeric">
+            </div>
+            <p id="otpError" style="color:#e08a8a; font-size:12px; margin:-6px 0 12px 0; display:none;"></p>
+            <p class="resend">¿No llegó? <b onclick="sendCode()">Reenviar código</b></p>
+            <div class="footer-actions">
+              <button class="btn primary" id="verifyBtn" onclick="verifyCode()">Verificar y continuar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen 2: ID Scan + Selfie (real Stripe Identity flow) -->
+        <div class="screen" id="s2">
+          <p class="eyebrow">Paso 2</p>
+          <h3>Verifica tu identidad</h3>
+          <p class="desc" id="idDesc">Vas a escanear tu cédula y tomarte una selfie en vivo. Esto abre una ventana segura de Stripe — nunca almacenamos tu documento nosotros mismos.</p>
+          <div class="cam-frame">
+            <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+            <div class="id-card-outline">
+              <div class="cedula-label">Cédula de Identidad</div>
+              <div class="cedula-lines"><div style="width:100%;"></div><div style="width:70%;"></div><div style="width:85%;"></div></div>
+            </div>
+            <div class="scan-caption" id="idCaption">Toca para comenzar</div>
+          </div>
+          <div class="checkmark-pop" id="idCheck">
+            <div class="circle">✓</div>
+            <p>Identidad enviada para revisión</p>
+          </div>
+          <p id="idError" style="color:#e08a8a; font-size:12px; margin:0 0 12px 0; display:none;"></p>
+          <p class="privacy-note">🔒 Solo usamos tu cédula para confirmar que eres real. Nunca se muestra en tu perfil ni se comparte con otros usuarios.</p>
+          <div class="footer-actions">
+            <button class="btn primary" id="idBtn" onclick="startIdentityVerification()">Iniciar verificación</button>
+          </div>
+        </div>
+
+        <!-- Screen 3: Selfie liveness -->
+        <div class="screen" id="s3">
+          <p class="eyebrow">Paso 3</p>
+          <h3>Prueba de vida</h3>
+          <p class="desc" id="selfieDesc">Esto confirma que eres tú, en vivo — no una foto guardada. Centra tu rostro y quédate quieto un momento.</p>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div class="face-rope-timer">
+              <svg width="150" height="150" viewBox="0 0 150 150">
+                <circle class="rope-base" cx="75" cy="75" r="64"/>
+                <circle class="rope-progress" id="selfieRing" cx="75" cy="75" r="64"/>
+              </svg>
+              <div class="face-rope-center">
+                <span class="glyph" id="selfieGlyph">☺</span>
+                <svg class="done-icon" id="selfieDoneIcon" width="30" height="32" viewBox="0 0 24 26" fill="none">
+                  <path d="M12 7.2 C 9.5 3.5, 4 5, 4 9.6 C 4 14.2, 12 19.4, 12 19.4 C 12 19.4, 20 14.2, 20 9.6 C 20 5, 14.5 3.5, 12 7.2 Z" stroke="#e6c988" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M12 19.4 C 9 21.4, 9.3 23.6, 12.4 24.6" stroke="#e6c988" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+            <p class="scan-caption-static" id="selfieCaption">Toca para empezar</p>
+          </div>
+          <div class="footer-actions">
+            <button class="btn primary" id="selfieBtn" onclick="captureSelfie()">Iniciar prueba de vida</button>
+          </div>
+        </div>
+
+        <!-- Screen 4: Review -->
+        <div class="screen" id="s4">
+          <div class="review-wrap">
+            <div class="clock">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="#e6c988" stroke-width="1.6"/>
+                <path d="M12 7 V12 L15.5 14" stroke="#e6c988" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h3>Ya casi está</h3>
+            <p>Estamos confirmando que la foto de tu cédula corresponde a una persona real. Esto puede tomar unos segundos o minutos.</p>
+            <div class="review-list">
+              <div class="ri"><div class="dot">✓</div> Número verificado</div>
+              <div class="ri"><div class="dot">✓</div> Identidad enviada a revisión</div>
+            </div>
+            <p class="privacy-note">🔒 Tu cédula solo se usa para confirmar tu identidad. Nunca aparece en tu perfil ni se comparte con otros usuarios.</p>
+            <button class="btn primary" id="reviewBtn" disabled>Revisando…</button>
+            <p class="resend" style="margin-top:10px;">Puedes cerrar la app y volver en unos minutos — te avisaremos.</p>
+          </div>
+        </div>
+
+        <!-- Screen 5: Approved -->
+        <div class="screen" id="s5">
+          <div class="approved-wrap">
+            <div class="badge-hero">✓</div>
+            <h3>Estás verificado</h3>
+            <p>Confirmamos que eres real. Tu perfil ya lleva la insignia de Lanza — ahora vamos a armar tu perfil.</p>
+            <button class="btn primary" onclick="goTo(6)">Crear mi perfil</button>
+            <button class="btn ghost small" onclick="restartFlow()">Empezar de nuevo</button>
+          </div>
+        </div>
+
+        <!-- Screen 6: Profile setup -->
+        <div class="screen" id="s6">
+          <p class="eyebrow">Tu perfil</p>
+          <h3>Cuéntanos de ti</h3>
+          <p class="desc">Esto es lo que verán otras personas cuando aparezcas en su lista.</p>
+          <input class="field" type="text" placeholder="Tu nombre" id="profileName">
+          <input class="field" type="date" placeholder="Fecha de nacimiento" id="profileDob">
+          <select class="field" id="profileGender">
+            <option value="" disabled selected>Género</option>
+            <option value="mujer">Mujer</option>
+            <option value="hombre">Hombre</option>
+            <option value="otro">Otro</option>
+          </select>
+          <select class="field" id="profileGenderPref">
+            <option value="" disabled selected>Buscando</option>
+            <option value="mujer">Mujeres</option>
+            <option value="hombre">Hombres</option>
+            <option value="todos">Todos</option>
+          </select>
+          <div style="margin-bottom:12px;">
+            <button type="button" class="btn ghost small" id="locateBtn" onclick="useMyLocation()" style="width:100%; margin-bottom:8px;">📍 Usar mi ubicación actual</button>
+            <div id="locationMap" style="width:100%; height:160px; border-radius:12px; border:1px solid var(--navy-line); overflow:hidden; display:none;"></div>
+            <p id="locationLabel" style="font-size:12.5px; color:#aab6c9; margin:8px 0 0 0; display:none;"></p>
+            <p id="locationError" style="color:#e08a8a; font-size:12px; margin:6px 0 0 0; display:none;"></p>
+          </div>
+          <textarea class="field" placeholder="Una breve bio…" id="profileBio" style="resize:none; height:70px; -moz-appearance:none; -webkit-appearance:none; appearance:none; font-family:'Inter',sans-serif;"></textarea>
+
+          <div style="display:flex; align-items:center; gap:12px; background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:12px; padding:12px 14px; margin-bottom:12px;">
+            <div id="photoPreviewWrap" style="width:44px; height:44px; border-radius:8px; background:rgba(201,161,90,.1); display:flex; align-items:center; justify-content:center; flex:none; overflow:hidden;">
+              <img id="photoPreview" style="width:100%; height:100%; object-fit:cover; display:none;">
+              <span id="photoPreviewIcon" style="font-size:18px; color:var(--gold-bright);">📷</span>
+            </div>
+            <span id="photoUploadLabel" style="font-size:13.5px; color:#c7cfdd; flex:1;">Añade tu foto principal</span>
+          </div>
+          <div style="display:flex; gap:9px; margin-bottom:12px;">
+            <label for="profilePhotoCamera" class="btn ghost small" style="flex:1; text-align:center; display:block; cursor:pointer;">📷 Tomar foto</label>
+            <label for="profilePhotoGallery" class="btn ghost small" style="flex:1; text-align:center; display:block; cursor:pointer;">🖼️ Elegir de galería</label>
+          </div>
+          <input type="file" accept="image/*" capture="user" id="profilePhotoCamera" style="display:none;" onchange="handlePhotoSelect(event)">
+          <input type="file" accept="image/*" id="profilePhotoGallery" style="display:none;" onchange="handlePhotoSelect(event)">
+
+          <p id="profileError" style="color:#e08a8a; font-size:12px; margin:-6px 0 12px 0; display:none;"></p>
+          <div class="footer-actions">
+            <button class="btn primary" id="saveProfileBtn" onclick="saveProfile()">Guardar y continuar</button>
+          </div>
+        </div>
+
+        <!-- Screen 7: Swipe deck -->
+        <div class="screen" id="s7">
+          <p class="eyebrow">Explorar</p>
+          <h3 id="swipeTitle">Perfiles verificados</h3>
+          <div id="swipeArea" style="flex:1; display:flex; flex-direction:column; position:relative; overflow:visible;">
+            <div id="candidateCard" style="flex:1; border-radius:18px; overflow:hidden; position:relative; background:var(--navy-mid); border:1px solid var(--navy-line); display:flex; align-items:flex-end; min-height:280px;">
+              <img id="candidatePhoto" src="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;">
+              <div style="position:relative; z-index:1; width:100%; padding:16px; background:linear-gradient(0deg, rgba(12,24,48,.9), transparent);">
+                <div id="candidateName" style="font-family:'Playfair Display',serif; font-size:19px; color:var(--cream);"></div>
+                <div id="candidateMeta" style="font-size:12px; color:#c7cfdd; margin-top:2px;"></div>
+                <div id="candidateBio" style="font-size:12.5px; color:#aab6c9; margin-top:6px;"></div>
+              </div>
+            </div>
+            <p id="swipeEmpty" style="text-align:center; color:#aab6c9; font-size:13px; display:none; margin:24px 0;">No hay más perfiles por ahora.<br><span style="color:#8291a8; font-size:11.5px;">Esto es normal si eres de las primeras personas registradas — vuelve cuando haya más gente verificada.</span></p>
+          </div>
+          <div id="swipeAnimLayer" style="position:relative; height:0; overflow:visible;"></div>
+          <div class="footer-actions" style="display:flex; gap:14px; justify-content:center; align-items:flex-start;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+              <button class="swipe-icon-btn" id="passBtn" onclick="swipeAction('pass')" title="Pasar" aria-label="Pasar">
+                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+                  <line x1="8" y1="14" x2="30" y2="26" stroke="#c9a15a" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="30" cy="26" r="4" fill="#e6c988"/>
+                  <circle cx="8" cy="14" r="2.5" fill="#8291a8"/>
+                </svg>
+              </button>
+              <span style="font-size:10px; color:#8291a8; letter-spacing:.02em;">Pasar</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+              <button class="swipe-icon-btn small" id="maybeBtn" onclick="swipeAction('maybe')" title="Tal vez" aria-label="Tal vez">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 12 H18 M13 6 L19 12 L13 18" stroke="#c9a15a" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <span style="font-size:10px; color:#8291a8; letter-spacing:.02em;">Tal vez</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+              <button class="swipe-icon-btn primary-icon" id="likeBtn" onclick="swipeAction('like')" title="Me gusta" aria-label="Me gusta">
+                <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+                  <path d="M20 32 C 11 25, 6 19, 6 12.5 C 6 7, 11 3, 16 6 C 18.5 7.5, 20 10, 20 10 C 20 10, 21.5 7.5, 24 6 C 29 3, 34 7, 34 12.5 C 34 19, 29 25, 20 32 Z" fill="#e6c988"/>
+                </svg>
+              </button>
+              <span style="font-size:10px; color:#8291a8; letter-spacing:.02em;">Me gusta</span>
+            </div>
+          </div>
+          <p id="matchNotice" style="text-align:center; color:var(--gold-bright); font-size:13px; margin-top:10px; display:none;">✨ ¡Es un match!</p>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+let current = 0;
+const totalSteps = 4; // steps counted for progress bar (0..3 map to seg1..seg4)
+
+function setProgress(step){
+  // step: 0=welcome(no fill),1=phone(fill1),2=id(fill1-2),4=review(fill1-4),5=approved(fill all),6+=profile/swipe(fill all, own label)
+  const segs = [document.getElementById('seg1'), document.getElementById('seg2'), document.getElementById('seg3'), document.getElementById('seg4')];
+  const fillCount = step === 0 ? 0 : Math.min(step, 4);
+  segs.forEach((s,i)=>{ s.style.width = i < fillCount ? '100%' : '0%'; });
+  const label = document.getElementById('stepCount');
+  if(step === 0) label.textContent = 'Antes de empezar';
+  else if(step === 6) label.textContent = 'Tu perfil';
+  else if(step >= 7) label.textContent = 'Explorando';
+  else if(step >= 5) label.textContent = 'Completo';
+  else label.textContent = `Paso ${step} de 4`;
+}
+
+function goTo(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  current = n;
+  setProgress(n);
+}
+
+let countdownTimer = null;
+const ROPE_CIRCUMFERENCE = 339.292;
+function startCountdown(){
+  clearInterval(countdownTimer);
+  const display = document.getElementById('countdownDisplay');
+  const label = document.getElementById('countdownLabel');
+  const ring = document.getElementById('ropeProgress');
+  const doneIcon = document.getElementById('doneIcon');
+  const btn = document.getElementById('reviewBtn');
+
+  btn.disabled = true;
+  btn.textContent = 'Espera un momento…';
+  display.style.display = 'block';
+  label.style.display = 'block';
+  doneIcon.classList.remove('show');
+  ring.classList.remove('complete');
+
+  let secondsLeft = 300; // represents 5:00
+  display.textContent = '05:00';
+  ring.style.stroke = '';
+  ring.style.strokeDashoffset = ROPE_CIRCUMFERENCE;
+
+  // demo pacing: ticks down faster than real time so you can see the full wait in a few seconds
+  countdownTimer = setInterval(()=>{
+    secondsLeft -= 6;
+    if(secondsLeft <= 0){
+      secondsLeft = 0;
+      clearInterval(countdownTimer);
+      ring.style.strokeDashoffset = 0;
+      ring.classList.add('complete');
+      display.style.display = 'none';
+      label.style.display = 'none';
+      doneIcon.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Actualizar para ver perfiles';
+    } else {
+      const elapsedFraction = (300 - secondsLeft) / 300;
+      ring.style.strokeDashoffset = ROPE_CIRCUMFERENCE * (1 - elapsedFraction);
+      const m = String(Math.floor(secondsLeft/60)).padStart(2,'0');
+      const s = String(secondsLeft%60).padStart(2,'0');
+      display.textContent = `${m}:${s}`;
+    }
+  }, 120);
+}
+
+// ---- Real backend wiring ----
+const API_BASE = 'https://lanza-backend-0cc2.onrender.com';
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51U3LAORyDyj0jJXXfvY4WDRV9tOZCy3KmjQ6OcNZ6Z0817o96KbNge51ehEdcqnlFEdrtJNkiQUBvSAijiIHX8vP001dZvCXOR';
+let currentUserId = null;
+let currentPhone = null;
+
+function showError(elId, message){
+  const el = document.getElementById(elId);
+  el.textContent = message;
+  el.style.display = 'block';
+}
+function hideError(elId){
+  document.getElementById(elId).style.display = 'none';
+}
+
+async function sendCode(){
+  const phoneInput = document.getElementById('phoneInput');
+  const phone = phoneInput.value.trim();
+  hideError('phoneError');
+
+  if(!phone){
+    showError('phoneError', 'Escribe tu número de teléfono.');
+    return;
+  }
+
+  const btn = document.getElementById('sendCodeBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  try {
+    // 1) Create (or find) the user record for this phone number.
+    const userRes = await fetch(`${API_BASE}/api/users`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const userData = await userRes.json();
+    if(!userRes.ok) throw new Error(userData.error || 'No se pudo crear el usuario.');
+
+    currentUserId = userData.id;
+    currentPhone = phone;
+
+    // 2) Ask the backend to send (or simulate, in dev mode) a code.
+    const sendRes = await fetch(`${API_BASE}/api/verify/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const sendData = await sendRes.json();
+    if(!sendRes.ok) throw new Error(sendData.error || 'No se pudo enviar el código.');
+
+    document.getElementById('phoneEntry').style.display = 'none';
+    document.getElementById('otpEntry').style.display = 'block';
+    document.getElementById('phoneDesc').textContent = sendData.devMode
+      ? 'Modo de prueba: usa el código 000000 para continuar.'
+      : 'Escribe el código de 6 dígitos que enviamos por SMS.';
+    document.querySelector('#otpEntry input').focus();
+  } catch(err){
+    showError('phoneError', err.message || 'Algo salió mal. Intenta de nuevo.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar código';
+  }
+}
+
+async function verifyCode(){
+  hideError('otpError');
+  const inputs = [...document.querySelectorAll('#otpEntry .otp-row input')];
+  const code = inputs.map(i => i.value).join('');
+
+  if(code.length < inputs.length){
+    showError('otpError', 'Completa los 6 dígitos del código.');
+    return;
+  }
+
+  const btn = document.getElementById('verifyBtn');
+  btn.disabled = true;
+  btn.textContent = 'Verificando…';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/verify/check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: currentPhone, code })
+    });
+    const data = await res.json();
+    if(!res.ok || !data.verified){
+      throw new Error(data.error || 'Código incorrecto. Intenta de nuevo.');
+    }
+    goTo(2);
+  } catch(err){
+    showError('otpError', err.message || 'Algo salió mal. Intenta de nuevo.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Verificar y continuar';
+  }
+}
+
+// auto-advance OTP inputs
+document.addEventListener('input', (e)=>{
+  if(e.target.matches('.otp-row input')){
+    const inputs = [...document.querySelectorAll('.otp-row input')];
+    const i = inputs.indexOf(e.target);
+    if(e.target.value && i < inputs.length-1) inputs[i+1].focus();
+  }
+});
+
+async function startIdentityVerification(){
+  hideError('idError');
+  if(!currentUserId){
+    showError('idError', 'Primero completa la verificación de teléfono.');
+    return;
+  }
+
+  const btn = document.getElementById('idBtn');
+  btn.disabled = true;
+  btn.textContent = 'Abriendo verificación…';
+
+  try {
+    // 1) Ask our backend to create a real Stripe Identity session for this user.
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/identity/start`, { method: 'POST' });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'No se pudo iniciar la verificación.');
+
+    // 2) Hand the client_secret to Stripe.js, which opens Stripe's own
+    // secure modal for the real document scan + selfie liveness check.
+    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+    const result = await stripe.verifyIdentity(data.client_secret);
+
+    if(result.error){
+      // User closed the modal early, or it failed — not necessarily fatal,
+      // they can just try again.
+      throw new Error(result.error.message || 'La verificación no se completó.');
+    }
+
+    // 3) Stripe's modal finished — the actual pass/fail determination
+    // happens asynchronously via webhook, so move to the review screen
+    // and poll our backend for the real result.
+    document.getElementById('idCaption').textContent = 'Enviado';
+    document.getElementById('idCheck').classList.add('show');
+    goTo(4);
+    pollIdentityStatus();
+  } catch(err){
+    showError('idError', err.message || 'Algo salió mal. Intenta de nuevo.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Iniciar verificación';
+  }
+}
+
+let identityPollTimer = null;
+async function pollIdentityStatus(){
+  clearInterval(identityPollTimer);
+  const btn = document.getElementById('reviewBtn');
+  btn.disabled = true;
+  btn.textContent = 'Revisando…';
+
+  identityPollTimer = setInterval(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${currentUserId}/identity/status`);
+      const data = await res.json();
+      if(data.identity_verified){
+        clearInterval(identityPollTimer);
+        btn.disabled = false;
+        btn.textContent = 'Continuar';
+        btn.onclick = () => goTo(5);
+      }
+      // If not yet verified, keep polling silently — Stripe's own review
+      // can take anywhere from seconds to a few minutes for edge cases.
+    } catch(err){
+      // Network hiccup during polling — just try again on the next tick.
+      console.error('Poll error:', err.message);
+    }
+  }, 4000);
+}
+
+function restartFlow(){
+  // reset all interior states
+  document.getElementById('phoneEntry').style.display = 'block';
+  document.getElementById('otpEntry').style.display = 'none';
+  document.getElementById('phoneDesc').textContent = 'Un número, una cuenta. Te enviaremos un código de verificación.';
+  document.getElementById('phoneInput').value = '';
+  hideError('phoneError');
+  hideError('otpError');
+  document.querySelectorAll('.otp-row input').forEach(i=>i.value='');
+  currentUserId = null;
+  currentPhone = null;
+  document.getElementById('idCaption').textContent = 'Toca para comenzar';
+  document.getElementById('idCheck').classList.remove('show');
+  hideError('idError');
+  const idBtn = document.getElementById('idBtn');
+  idBtn.textContent = 'Iniciar verificación';
+  idBtn.onclick = startIdentityVerification;
+  clearInterval(identityPollTimer);
+  pickedLat = null;
+  pickedLng = null;
+  pickedCity = '';
+  document.getElementById('locationMap').style.display = 'none';
+  document.getElementById('locationLabel').style.display = 'none';
+  hideError('locationError');
+  goTo(0);
+}
+
+// ---- Real GPS location + map picker ----
+let pickedLat = null;
+let pickedLng = null;
+let pickedCity = '';
+let leafletMap = null;
+let leafletMarker = null;
+
+async function reverseGeocode(lat, lng){
+  // Free, no-key reverse geocoding via OpenStreetMap's Nominatim service.
+  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`, {
+    headers: { 'Accept-Language': 'es' }
+  });
+  const data = await res.json();
+  const addr = data.address || {};
+  return addr.city || addr.town || addr.village || addr.county || data.display_name || 'Ubicación desconocida';
+}
+
+function showMap(lat, lng){
+  const mapEl = document.getElementById('locationMap');
+  mapEl.style.display = 'block';
+
+  if(!leafletMap){
+    leafletMap = L.map('locationMap', { zoomControl: false, attributionControl: false }).setView([lat, lng], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
+    leafletMarker = L.marker([lat, lng]).addTo(leafletMap);
+  } else {
+    leafletMap.setView([lat, lng], 12);
+    leafletMarker.setLatLng([lat, lng]);
+  }
+  // Leaflet needs a nudge to render correctly inside a screen that was
+  // just made visible (it can't measure a hidden container's size).
+  setTimeout(() => leafletMap.invalidateSize(), 200);
+}
+
+async function useMyLocation(){
+  const errorEl = document.getElementById('locationError');
+  const labelEl = document.getElementById('locationLabel');
+  const btn = document.getElementById('locateBtn');
+  errorEl.style.display = 'none';
+
+  if(!navigator.geolocation){
+    errorEl.textContent = 'Tu navegador no soporta geolocalización.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Buscando tu ubicación…';
+
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      pickedLat = position.coords.latitude;
+      pickedLng = position.coords.longitude;
+      console.log('[Lanza] Got coordinates:', pickedLat, pickedLng);
+
+      try {
+        showMap(pickedLat, pickedLng);
+      } catch(mapErr){
+        console.error('[Lanza] Map render failed:', mapErr);
+        // Not fatal — we can still save the location even if the visual
+        // map fails to draw (e.g. the map library didn't load).
+      }
+
+      labelEl.textContent = 'Buscando el nombre de tu ciudad…';
+      labelEl.style.display = 'block';
+      try {
+        pickedCity = await reverseGeocode(pickedLat, pickedLng);
+        labelEl.textContent = `📍 ${pickedCity}`;
+      } catch(err){
+        console.error('[Lanza] Reverse geocode failed:', err);
+        pickedCity = `${pickedLat.toFixed(3)}, ${pickedLng.toFixed(3)}`;
+        labelEl.textContent = '📍 Ubicación guardada (no se pudo obtener el nombre de la ciudad).';
+      }
+
+      btn.disabled = false;
+      btn.textContent = '📍 Actualizar mi ubicación';
+    },
+    (err) => {
+      console.error('[Lanza] Geolocation error:', err);
+      btn.disabled = false;
+      btn.textContent = '📍 Usar mi ubicación actual';
+      if(err.code === err.PERMISSION_DENIED){
+        errorEl.textContent = 'Necesitamos tu permiso de ubicación para mostrarte personas cerca de ti.';
+      } else {
+        errorEl.textContent = 'No se pudo obtener tu ubicación. Intenta de nuevo.';
+      }
+      errorEl.style.display = 'block';
+    }
+  );
+}
+
+// ---- Photo upload (real, via Cloudinary unsigned upload) ----
+const CLOUDINARY_CLOUD_NAME = 'idlwdsyc';
+const CLOUDINARY_UPLOAD_PRESET = 'lanza_unsigned';
+let uploadedPhotoUrl = null;
+let selectedPhotoFile = null;
+
+function handlePhotoSelect(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  selectedPhotoFile = file;
+  uploadedPhotoUrl = null; // will be set for real once actually uploaded
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById('photoPreview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('photoPreviewIcon').style.display = 'none';
+    document.getElementById('photoUploadLabel').textContent = file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadSelectedPhoto(){
+  if(!selectedPhotoFile) return null;
+
+  const formData = new FormData();
+  formData.append('file', selectedPhotoFile);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    method: 'POST',
+    body: formData
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error?.message || 'No se pudo subir la foto.');
+  return data.secure_url;
+}
+
+// ---- Profile setup ----
+async function saveProfile(){
+  hideError('profileError');
+  const name = document.getElementById('profileName').value.trim();
+  const date_of_birth = document.getElementById('profileDob').value;
+  const gender = document.getElementById('profileGender').value;
+  const gender_preference = document.getElementById('profileGenderPref').value;
+  const bio = document.getElementById('profileBio').value.trim();
+
+  if(!name || !date_of_birth || !gender || !gender_preference){
+    showError('profileError', 'Completa al menos tu nombre, fecha de nacimiento, género y preferencia.');
+    return;
+  }
+  if(!currentUserId){
+    showError('profileError', 'Falta verificar tu cuenta primero.');
+    return;
+  }
+  if(!pickedLat || !pickedLng){
+    showError('profileError', 'Toca "Usar mi ubicación actual" para que otros sepan dónde estás.');
+    return;
+  }
+
+  const btn = document.getElementById('saveProfileBtn');
+  btn.disabled = true;
+  btn.textContent = 'Guardando…';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/profile`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name, date_of_birth, gender, gender_preference, bio,
+        city: pickedCity, latitude: pickedLat, longitude: pickedLng
+      })
+    });
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || 'No se pudo guardar el perfil.');
+
+    if(selectedPhotoFile){
+      btn.textContent = 'Subiendo foto…';
+      const photoUrl = await uploadSelectedPhoto();
+      if(photoUrl){
+        await fetch(`${API_BASE}/api/users/${currentUserId}/photos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: photoUrl, position: 0 })
+        });
+      }
+    }
+
+    await fetch(`${API_BASE}/api/users/${currentUserId}/complete-profile`, { method: 'POST' });
+
+    goTo(7);
+    loadCandidates();
+  } catch(err){
+    showError('profileError', err.message || 'Algo salió mal. Intenta de nuevo.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar y continuar';
+  }
+}
+
+// ---- Swipe deck ----
+let candidates = [];
+let candidateIndex = 0;
+
+function ageFromDob(dob){
+  if(!dob) return '';
+  const birth = new Date(dob);
+  const diff = Date.now() - birth.getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+}
+
+async function loadCandidates(){
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/candidates`);
+    const data = await res.json();
+    candidates = data.candidates || [];
+    candidateIndex = 0;
+    renderCandidate();
+  } catch(err){
+    console.error('Load candidates error:', err.message);
+  }
+}
+
+function renderCandidate(){
+  const card = document.getElementById('candidateCard');
+  const empty = document.getElementById('swipeEmpty');
+  const photo = document.getElementById('candidatePhoto');
+  const nameEl = document.getElementById('candidateName');
+  const metaEl = document.getElementById('candidateMeta');
+  const bioEl = document.getElementById('candidateBio');
+
+  card.classList.remove('fly-pass', 'fly-like');
+
+  if(candidateIndex >= candidates.length){
+    card.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  card.style.display = 'flex';
+  empty.style.display = 'none';
+
+  const c = candidates[candidateIndex];
+  const firstPhoto = c.photos && c.photos.length ? c.photos[0].url : null;
+  if(firstPhoto){
+    photo.src = firstPhoto;
+    photo.style.display = 'block';
+  } else {
+    photo.style.display = 'none';
+  }
+  nameEl.textContent = c.name || 'Sin nombre';
+  const distanceLabel = c.distance_km !== null && c.distance_km !== undefined
+    ? `${c.distance_km} km` : null;
+  metaEl.textContent = [ageFromDob(c.date_of_birth), c.city, distanceLabel].filter(Boolean).join(' · ');
+  bioEl.textContent = c.bio || '';
+}
+
+function playSwipeAnimation(direction){
+  const layer = document.getElementById('swipeAnimLayer');
+  const card = document.getElementById('candidateCard');
+  const area = document.getElementById('swipeArea');
+  layer.innerHTML = '';
+
+  if(direction === 'pass'){
+    card.classList.remove('fly-like');
+    card.classList.add('fly-pass');
+
+    const bat = document.createElement('div');
+    bat.className = 'anim-bat-center';
+    bat.textContent = '🏏';
+    const ball = document.createElement('div');
+    ball.className = 'anim-ball-center';
+    ball.textContent = '⚾';
+    area.appendChild(bat);
+    area.appendChild(ball);
+    setTimeout(() => { bat.remove(); ball.remove(); }, 750);
+
+  } else if(direction === 'like'){
+    card.classList.remove('fly-pass');
+    card.classList.add('fly-like');
+
+    // Burst several red hearts across the whole swipe area.
+    const rect = area.getBoundingClientRect();
+    const heartCount = 10;
+    for(let i = 0; i < heartCount; i++){
+      const heart = document.createElement('div');
+      heart.className = 'heart-particle';
+      heart.textContent = ['❤️','💕','✨'][i % 3];
+      const startX = 20 + Math.random() * (rect.width - 40);
+      const startY = rect.height - 40 - Math.random() * 60;
+      const endX = (Math.random() - 0.5) * 160;
+      const endY = -(120 + Math.random() * 140);
+      heart.style.left = `${startX}px`;
+      heart.style.top = `${startY}px`;
+      heart.style.setProperty('--heart-end', `translate(${endX}px, ${endY}px)`);
+      heart.style.animationDelay = `${Math.random() * 0.25}s`;
+      area.appendChild(heart);
+      setTimeout(() => heart.remove(), 1300);
+    }
+  } else if(direction === 'maybe'){
+    card.classList.add('wobble-maybe');
+    setTimeout(() => card.classList.remove('wobble-maybe'), 650);
+
+    const rect = area.getBoundingClientRect();
+    const colors = ['#c0392b', '#4c9468']; // red, green
+    const qCount = 8;
+    for(let i = 0; i < qCount; i++){
+      const q = document.createElement('div');
+      q.className = 'heart-particle';
+      q.textContent = '?';
+      q.style.fontFamily = "'Playfair Display', serif";
+      q.style.fontWeight = '800';
+      q.style.color = colors[i % 2];
+      q.style.fontSize = '56px';
+      const startX = 20 + Math.random() * (rect.width - 40);
+      const startY = rect.height - 40 - Math.random() * 60;
+      const endX = (Math.random() - 0.5) * 160;
+      const endY = -(120 + Math.random() * 140);
+      q.style.left = `${startX}px`;
+      q.style.top = `${startY}px`;
+      q.style.setProperty('--heart-end', `translate(${endX}px, ${endY}px)`);
+      q.style.animationDelay = `${Math.random() * 0.25}s`;
+      area.appendChild(q);
+      setTimeout(() => q.remove(), 1300);
+    }
+  }
+}
+
+async function swipeAction(direction){
+  if(candidateIndex >= candidates.length) return;
+  playSwipeAnimation(direction);
+  const c = candidates[candidateIndex];
+  const notice = document.getElementById('matchNotice');
+  notice.style.display = 'none';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to_user_id: c.id, direction })
+    });
+    const data = await res.json();
+    if(data.matched){
+      notice.style.display = 'block';
+    }
+  } catch(err){
+    console.error('Swipe error:', err.message);
+  }
+
+  const animDelay = direction === 'maybe' ? 900 : 700;
+  setTimeout(() => {
+    candidateIndex += 1;
+    renderCandidate();
+  }, animDelay);
+}
+
+setProgress(0);
+</script>
+
+</body>
+</html>
