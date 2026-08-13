@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -541,19 +543,27 @@
         </div>
 
         <!-- Screen 7: Swipe deck -->
-        <div class="screen" id="s7">
+        <div class="screen" id="s7" style="padding-top:14px;">
           <p class="eyebrow">Explorar</p>
-          <h3 id="swipeTitle">Perfiles verificados</h3>
+          <h3 id="swipeTitle" style="margin-bottom:14px;">Personas reales cerca de ti</h3>
           <div id="swipeArea" style="flex:1; display:flex; flex-direction:column; position:relative; overflow:visible;">
-            <div id="candidateCard" style="flex:1; border-radius:18px; overflow:hidden; position:relative; background:var(--navy-mid); border:1px solid var(--navy-line); display:flex; align-items:flex-end; min-height:280px;">
+            <div id="candidateCard" style="flex:1; border-radius:22px; overflow:hidden; position:relative; background:linear-gradient(160deg, var(--navy-mid), var(--navy-deep)); border:1px solid var(--navy-line); box-shadow:0 18px 40px rgba(0,0,0,.35); display:flex; align-items:flex-end; min-height:340px;">
               <img id="candidatePhoto" src="" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;">
-              <div style="position:relative; z-index:1; width:100%; padding:16px; background:linear-gradient(0deg, rgba(12,24,48,.9), transparent);">
-                <div id="candidateName" style="font-family:'Playfair Display',serif; font-size:19px; color:var(--cream);"></div>
-                <div id="candidateMeta" style="font-size:12px; color:#c7cfdd; margin-top:2px;"></div>
-                <div id="candidateBio" style="font-size:12.5px; color:#aab6c9; margin-top:6px;"></div>
+              <div id="candidateVerifiedBadge" style="position:absolute; top:14px; right:14px; z-index:2; background:rgba(12,24,48,.75); backdrop-filter:blur(4px); border:1px solid rgba(230,201,136,.4); border-radius:20px; padding:5px 11px; display:flex; align-items:center; gap:5px;">
+                <span style="color:var(--gold-bright); font-size:12px;">✓</span>
+                <span style="font-size:10.5px; color:var(--cream); letter-spacing:.03em;">Verificado</span>
+              </div>
+              <div style="position:relative; z-index:1; width:100%; padding:20px; background:linear-gradient(0deg, rgba(8,16,32,.95) 10%, rgba(8,16,32,.55) 55%, transparent);">
+                <div id="candidateName" style="font-family:'Playfair Display',serif; font-size:23px; font-weight:700; color:var(--cream);"></div>
+                <div id="candidateMeta" style="font-size:12.5px; color:#c7cfdd; margin-top:3px; letter-spacing:.02em;"></div>
+                <div id="candidateBio" style="font-size:13px; color:#aab6c9; margin-top:8px; line-height:1.4;"></div>
               </div>
             </div>
-            <p id="swipeEmpty" style="text-align:center; color:#aab6c9; font-size:13px; display:none; margin:24px 0;">No hay más perfiles por ahora.<br><span style="color:#8291a8; font-size:11.5px;">Esto es normal si eres de las primeras personas registradas — vuelve cuando haya más gente verificada.</span></p>
+            <div id="swipeEmpty" style="display:none; flex:1; min-height:340px; border-radius:22px; border:1px dashed var(--navy-line); align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:30px;">
+              <div style="width:52px; height:52px; border-radius:50%; background:rgba(230,201,136,.08); border:1px solid rgba(230,201,136,.25); display:flex; align-items:center; justify-content:center; margin-bottom:14px; font-size:20px; color:var(--gold-bright);">✓</div>
+              <p style="color:#c7cfdd; font-size:14px; margin:0 0 6px 0; font-family:'Playfair Display',serif;">Por ahora eso es todo</p>
+              <p style="color:#8291a8; font-size:12.5px; margin:0; max-width:220px; line-height:1.5;">Eres de las primeras personas registradas. Vuelve pronto — cada día se une gente nueva y verificada.</p>
+            </div>
           </div>
           <div id="swipeAnimLayer" style="position:relative; height:0; overflow:visible;"></div>
           <div class="footer-actions" style="display:flex; gap:14px; justify-content:center; align-items:flex-start;">
@@ -1093,7 +1103,7 @@ function renderCandidate(){
 
   if(candidateIndex >= candidates.length){
     card.style.display = 'none';
-    empty.style.display = 'block';
+    empty.style.display = 'flex';
     return;
   }
 
