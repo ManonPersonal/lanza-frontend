@@ -336,14 +336,14 @@
   #candidateCard.fly-pass{animation:cardFlyPass .7s cubic-bezier(.3,.6,.6,1) forwards;}
 
   @keyframes batSwingCorner{
-    0%{transform:rotate(78deg) translate(26px, 40px); opacity:1;}
-    42%{transform:rotate(-6deg) translate(-6px, -10px); opacity:1;}
-    58%{transform:rotate(-6deg) translate(-6px, -10px); opacity:1;}
-    100%{transform:rotate(-6deg) translate(-6px, -10px); opacity:0;}
+    0%{transform:rotate(-55deg) translate(0px, -60px); opacity:1;}
+    45%{transform:rotate(35deg) translate(10px, 20px); opacity:1;}
+    60%{transform:rotate(35deg) translate(10px, 20px); opacity:1;}
+    100%{transform:rotate(35deg) translate(10px, 20px); opacity:0;}
   }
   .anim-bat-corner{
-    position:absolute; right:-10%; bottom:-16%; width:200px; height:200px;
-    transform-origin:78% 78%; animation:batSwingCorner .7s ease forwards;
+    position:absolute; right:2%; bottom:6%; width:180px; height:180px;
+    transform-origin:80% 82%; animation:batSwingCorner .7s ease forwards;
     z-index:3; pointer-events:none;
   }
 
@@ -1900,39 +1900,43 @@ function playSwipeAnimation(direction){
     const bat = document.createElement('div');
     bat.className = 'anim-bat-corner';
     bat.innerHTML = `
-      <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="batWood" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#e8c78a"/>
-            <stop offset="55%" stop-color="#c99a5e"/>
+          <linearGradient id="batHandleWood" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#8a6438"/>
+            <stop offset="50%" stop-color="#c99a5e"/>
             <stop offset="100%" stop-color="#8a6438"/>
           </linearGradient>
-          <linearGradient id="batHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fff3d8" stop-opacity=".55"/>
-            <stop offset="100%" stop-color="#fff3d8" stop-opacity="0"/>
+          <linearGradient id="batBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#1a3f7a"/>
+            <stop offset="50%" stop-color="#2f5ea8"/>
+            <stop offset="100%" stop-color="#1a3f7a"/>
+          </linearGradient>
+          <linearGradient id="batRed" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#8f1d1d"/>
+            <stop offset="50%" stop-color="#c92e2e"/>
+            <stop offset="100%" stop-color="#8f1d1d"/>
+          </linearGradient>
+          <linearGradient id="batWhite" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#d9dde3"/>
+            <stop offset="50%" stop-color="#f5f6f8"/>
+            <stop offset="100%" stop-color="#d9dde3"/>
           </linearGradient>
         </defs>
-        <g transform="rotate(-38 100 100)">
-          <!-- barrel (thick end) tapering down to the handle -->
-          <path d="M100 18
-                   C 118 18, 130 30, 132 50
-                   C 134 78, 126 108, 112 132
-                   C 104 146, 96 156, 90 164
-                   C 84 170, 78 172, 74 168
-                   C 70 163, 72 155, 78 146
-                   C 90 128, 100 104, 104 78
-                   C 107 58, 102 40, 92 28
-                   C 96 22, 98 19, 100 18 Z"
-                fill="url(#batWood)" stroke="#6b4a24" stroke-width="1.4"/>
-          <!-- narrow handle -->
-          <path d="M74 168 C 70 174, 66 180, 61 187 C 58 191, 54 192, 51 189 C 49 186, 50 182, 53 178 C 58 171, 63 165, 68 160 Z"
-                fill="url(#batWood)" stroke="#6b4a24" stroke-width="1.4"/>
-          <!-- grip tape near the knob -->
-          <path d="M55 183 L64 174 M51 179 L60 170 M59 187 L68 178"
-                stroke="#4a3218" stroke-width="2" stroke-linecap="round"/>
-          <!-- soft highlight down the barrel for a rounded, realistic feel -->
-          <path d="M96 26 C 108 40, 112 62, 106 86 C 101 108, 92 128, 82 144"
-                stroke="url(#batHighlight)" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <!-- straight bat, barrel at top, tapering to handle at bottom -->
+        <g>
+          <!-- barrel: blue / white / red bands, nearly straight sides -->
+          <path d="M76 10 L104 10 L106 60 L74 60 Z" fill="url(#batBlue)" stroke="#0d2246" stroke-width="1.2"/>
+          <path d="M74 60 L106 60 L107 84 L73 84 Z" fill="url(#batWhite)" stroke="#9aa0a8" stroke-width="1.2"/>
+          <path d="M73 84 L107 84 L104 112 L76 112 Z" fill="url(#batRed)" stroke="#5c1212" stroke-width="1.2"/>
+          <!-- taper into the neck -->
+          <path d="M76 112 L104 112 L96 138 L84 138 Z" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
+          <!-- handle -->
+          <rect x="84" y="138" width="12" height="34" rx="4" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
+          <!-- knob at the end -->
+          <ellipse cx="90" cy="174" rx="9" ry="5" fill="#6b4a24" stroke="#4a3218" stroke-width="1.2"/>
+          <!-- grip tape wraps -->
+          <path d="M84 144 L96 144 M84 152 L96 152 M84 160 L96 160 M84 168 L96 168" stroke="#4a3218" stroke-width="1.6"/>
         </g>
       </svg>`;
     area.appendChild(bat);
