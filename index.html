@@ -336,14 +336,14 @@
   #candidateCard.fly-pass{animation:cardFlyPass .7s cubic-bezier(.3,.6,.6,1) forwards;}
 
   @keyframes batSwingCorner{
-    0%{transform:rotate(-55deg) translate(0px, -60px); opacity:1;}
-    45%{transform:rotate(35deg) translate(10px, 20px); opacity:1;}
-    60%{transform:rotate(35deg) translate(10px, 20px); opacity:1;}
-    100%{transform:rotate(35deg) translate(10px, 20px); opacity:0;}
+    0%{transform:translate(-280px, -20px) rotate(-70deg); opacity:1;}
+    45%{transform:translate(8px, 26px) rotate(30deg); opacity:1;}
+    60%{transform:translate(8px, 26px) rotate(30deg); opacity:1;}
+    100%{transform:translate(8px, 26px) rotate(30deg); opacity:0;}
   }
   .anim-bat-corner{
-    position:absolute; right:2%; bottom:6%; width:180px; height:180px;
-    transform-origin:80% 82%; animation:batSwingCorner .7s ease forwards;
+    position:absolute; right:0%; bottom:2%; width:180px; height:220px;
+    transform-origin:80% 88%; animation:batSwingCorner .7s ease forwards;
     z-index:3; pointer-events:none;
   }
 
@@ -1900,7 +1900,7 @@ function playSwipeAnimation(direction){
     const bat = document.createElement('div');
     bat.className = 'anim-bat-corner';
     bat.innerHTML = `
-      <svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+      <svg width="180" height="220" viewBox="0 0 180 220" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="batHandleWood" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#8a6438"/>
@@ -1923,20 +1923,20 @@ function playSwipeAnimation(direction){
             <stop offset="100%" stop-color="#d9dde3"/>
           </linearGradient>
         </defs>
-        <!-- straight bat, barrel at top, tapering to handle at bottom -->
+        <!-- straight bat, barrel at top, tapering to a longer handle at bottom -->
         <g>
           <!-- barrel: blue / white / red bands, nearly straight sides -->
-          <path d="M76 10 L104 10 L106 60 L74 60 Z" fill="url(#batBlue)" stroke="#0d2246" stroke-width="1.2"/>
-          <path d="M74 60 L106 60 L107 84 L73 84 Z" fill="url(#batWhite)" stroke="#9aa0a8" stroke-width="1.2"/>
-          <path d="M73 84 L107 84 L104 112 L76 112 Z" fill="url(#batRed)" stroke="#5c1212" stroke-width="1.2"/>
+          <path d="M76 6 L104 6 L106 62 L74 62 Z" fill="url(#batBlue)" stroke="#0d2246" stroke-width="1.2"/>
+          <path d="M74 62 L106 62 L107 90 L73 90 Z" fill="url(#batWhite)" stroke="#9aa0a8" stroke-width="1.2"/>
+          <path d="M73 90 L107 90 L104 122 L76 122 Z" fill="url(#batRed)" stroke="#5c1212" stroke-width="1.2"/>
           <!-- taper into the neck -->
-          <path d="M76 112 L104 112 L96 138 L84 138 Z" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
-          <!-- handle -->
-          <rect x="84" y="138" width="12" height="34" rx="4" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
+          <path d="M76 122 L104 122 L96 150 L84 150 Z" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
+          <!-- longer handle -->
+          <rect x="84" y="150" width="12" height="52" rx="4" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
           <!-- knob at the end -->
-          <ellipse cx="90" cy="174" rx="9" ry="5" fill="#6b4a24" stroke="#4a3218" stroke-width="1.2"/>
+          <ellipse cx="90" cy="208" rx="9" ry="5" fill="#6b4a24" stroke="#4a3218" stroke-width="1.2"/>
           <!-- grip tape wraps -->
-          <path d="M84 144 L96 144 M84 152 L96 152 M84 160 L96 160 M84 168 L96 168" stroke="#4a3218" stroke-width="1.6"/>
+          <path d="M84 156 L96 156 M84 166 L96 166 M84 176 L96 176 M84 186 L96 186 M84 196 L96 196" stroke="#4a3218" stroke-width="1.6"/>
         </g>
       </svg>`;
     area.appendChild(bat);
