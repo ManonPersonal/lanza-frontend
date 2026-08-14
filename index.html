@@ -973,7 +973,10 @@
               </div>
             </div>
 
-            <button onclick="openMatchesScreen()" class="btn ghost small" style="width:100%; margin-bottom:18px; display:flex; align-items:center; justify-content:center; gap:6px;">💛 Ver mis matches</button>
+            <button onclick="openMatchesScreen()" class="btn ghost small" style="width:100%; margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:6px;">💛 Ver mis matches</button>
+            <div id="acctUpgradeWrap" style="display:none; margin-bottom:18px;">
+              <button onclick="chooseServiceTier('premium')" class="btn primary" style="width:100%;">✨ Pasar a servicio completo — RD$300</button>
+            </div>
 
             <p class="eyebrow" style="margin-top:6px;">Tus fotos</p>
             <div id="acctPhotoGallery" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"></div>
@@ -1303,19 +1306,32 @@ async function chooseServiceTier(tier){
   const errorEl = document.getElementById('serviceTierError');
   errorEl.style.display = 'none';
 
-  try {
-    await fetch(`${API_BASE}/api/users/${currentUserId}/service-tier`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tier })
-    });
-  } catch(err){
-    errorEl.textContent = 'No se pudo guardar tu elección, pero puedes continuar — inténtalo de nuevo luego desde tu cuenta.';
-    errorEl.style.display = 'block';
+  if(tier === 'free'){
+    try {
+      await fetch(`${API_BASE}/api/users/${currentUserId}/service-tier`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier: 'free' })
+      });
+    } catch(err){
+      console.error('Service tier error:', err.message);
+    }
+    goTo(7);
+    loadCandidates();
+    return;
   }
 
-  goTo(7);
-  loadCandidates();
+  // Premium requires a real payment — redirect to Stripe's own hosted
+  // Checkout page. We never collect card details ourselves.
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/checkout-session`, { method: 'POST' });
+    const data = await res.json();
+    if(!res.ok || !data.url) throw new Error(data.error || 'No se pudo iniciar el pago.');
+    window.location.href = data.url;
+  } catch(err){
+    errorEl.textContent = err.message || 'No se pudo iniciar el pago. Intenta de nuevo.';
+    errorEl.style.display = 'block';
+  }
 }
 
 function acceptConsentAndContinue(){
@@ -2048,6 +2064,7 @@ async function openAccountScreen(){
     badge.style.color = data.identity_verified ? '#f6d98a' : '#8291a8';
 
     renderAccountPhotos(data.photos || []);
+    document.getElementById('acctUpgradeWrap').style.display = data.service_tier === 'premium' ? 'none' : 'block';
 
     if(data.latitude && data.longitude){
       pickedLat = data.latitude;
@@ -2390,7 +2407,36 @@ function logOut(){
   goTo(11);
 }
 
+// ---- Handle return from Stripe Checkout ----
+async function handleCheckoutReturn(){
+  const params = new URLSearchParams(window.location.search);
+  const checkout = params.get('checkout');
+  if(!checkout) return;
+
+  // Clean the URL so refreshing doesn't re-trigger this.
+  window.history.replaceState({}, document.title, window.location.pathname);
+
+  if(checkout === 'success'){
+    const sessionId = params.get('session_id');
+    if(!sessionId) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/checkout-session/${sessionId}/confirm`);
+      const data = await res.json();
+      if(data.paid && data.userId){
+        currentUserId = data.userId;
+        goTo(7);
+        loadCandidates();
+      }
+    } catch(err){
+      console.error('Checkout confirm error:', err.message);
+    }
+  } else if(checkout === 'cancel'){
+    goTo(11); // Home — invite them to sign back in and continue browsing for free
+  }
+}
+
 setProgress(0);
+handleCheckoutReturn();
 </script>
 
 </body>
