@@ -512,13 +512,174 @@
             <option value="hombre">Hombres</option>
             <option value="todos">Todos</option>
           </select>
+          <textarea class="field" placeholder="Una breve bio… (mínimo 2 palabras)" id="profileBio" style="resize:none; height:70px; -moz-appearance:none; -webkit-appearance:none; appearance:none; font-family:'Inter',sans-serif;"></textarea>
+
+          <input class="field" type="text" placeholder="¿A qué te dedicas? (uso interno, no se muestra)" id="profileOccupation">
+          <input class="field" type="text" placeholder="Tus intereses (ej. senderismo, cocina, música)" id="profileInterests">
+          <input class="field" type="number" placeholder="Estatura (cm)" id="profileHeight" min="120" max="230">
+
+          <select class="field has-other" id="profileHasKids" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Tienes hijos?</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+            <option value="prefiero_no_decir">Prefiero no decir</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileHasKidsOther" style="display:none;">
+
+          <select class="field has-other" id="profileHasPets" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Tienes mascotas?</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileHasPetsOther" style="display:none;">
+
+          <select class="field has-other" id="profileLivingSituation" onchange="toggleOther(this)">
+            <option value="" disabled selected>Situación de vivienda</option>
+            <option value="solo">Vivo solo/a</option>
+            <option value="con_familia">Vivo con familia</option>
+            <option value="con_roommates">Vivo con roommates</option>
+            <option value="prefiero_no_decir">Prefiero no decir</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileLivingSituationOther" style="display:none;">
+
+          <select class="field has-other" id="profileChildrenPref" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Quieres más hijos?</option>
+            <option value="mas_hijos">Sí, quiero más hijos</option>
+            <option value="no_mas_hijos">No quiero más hijos</option>
+            <option value="no_seguro">No estoy seguro/a</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileChildrenPrefOther" style="display:none;">
+
+          <select class="field has-other" id="profileRelationshipGoals" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Qué buscas?</option>
+            <option value="tired_of_games">Cansado/a de los juegos</option>
+            <option value="long_term">Pareja a largo plazo</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileRelationshipGoalsOther" style="display:none;">
+
+          <select class="field" id="profileEducation">
+            <option value="" selected>Educación (opcional)</option>
+            <option value="secundaria">Secundaria</option>
+            <option value="universidad">Universidad</option>
+            <option value="posgrado">Posgrado</option>
+            <option value="otro">Otro</option>
+          </select>
+
+          <select class="field has-other" id="profileCommunicationPref" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Cómo prefieres comunicarte?</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="redes_sociales">Redes sociales</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileCommunicationPrefOther" style="display:none;">
+
+          <select class="field has-other" id="profileAffectionate" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Eres una persona afectuosa?</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+            <option value="no_se">No lo sé</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileAffectionateOther" style="display:none;">
+
+          <select class="field has-other" id="profileZodiac" onchange="toggleOther(this)">
+            <option value="" disabled selected>Signo zodiacal</option>
+            <option value="aries">Aries</option>
+            <option value="tauro">Tauro</option>
+            <option value="geminis">Géminis</option>
+            <option value="cancer">Cáncer</option>
+            <option value="leo">Leo</option>
+            <option value="virgo">Virgo</option>
+            <option value="libra">Libra</option>
+            <option value="escorpio">Escorpio</option>
+            <option value="sagitario">Sagitario</option>
+            <option value="capricornio">Capricornio</option>
+            <option value="acuario">Acuario</option>
+            <option value="piscis">Piscis</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileZodiacOther" style="display:none;">
+
+          <select class="field has-other" id="profileAlcohol" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Consumes alcohol?</option>
+            <option value="una_copa_diaria">Una copa al día</option>
+            <option value="socialmente">Socialmente</option>
+            <option value="no_bebo">No bebo alcohol</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileAlcoholOther" style="display:none;">
+
+          <select class="field has-other" id="profileSmoking" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Fumas?</option>
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+            <option value="no_fumo">No fumo</option>
+            <option value="socialmente">Socialmente</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileSmokingOther" style="display:none;">
+
+          <select class="field has-other" id="profileSocialMedia" onchange="toggleOther(this)">
+            <option value="" disabled selected>Presencia en redes sociales</option>
+            <option value="si">Sí, activo/a</option>
+            <option value="no">No tengo</option>
+            <option value="solo_scroll">Solo para ver, no publico</option>
+            <option value="poco_activo">Poco activo/a</option>
+            <option value="fuera_de_la_red">Fuera de la red por completo</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileSocialMediaOther" style="display:none;">
+
+          <select class="field" id="profileWeekendStyle">
+            <option value="" selected>¿Cómo son tus fines de semana? (opcional)</option>
+            <option value="activo">Activos y llenos de planes</option>
+            <option value="tranquilo">Tranquilos y relajados</option>
+            <option value="mixto">Un poco de ambos</option>
+            <option value="otro">Otro</option>
+          </select>
+
+          <select class="field has-other" id="profileGoingOut" onchange="toggleOther(this)">
+            <option value="" disabled selected>Salir con amigos</option>
+            <option value="grupo_grande">Tengo un grupo grande de amigos</option>
+            <option value="circulo_pequeno">Tengo un círculo pequeño y cercano</option>
+            <option value="prefiero_casa">Prefiero quedarme en casa viendo TV</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileGoingOutOther" style="display:none;">
+
+          <select class="field has-other" id="profileFirstDate" onchange="toggleOther(this)">
+            <option value="" disabled selected>Tu primera cita ideal</option>
+            <option value="paseo_malecon">Un paseo por el malecón</option>
+            <option value="tomar_algo">Tomar algo</option>
+            <option value="encuentro_rapido">Un encuentro rápido para conocernos</option>
+            <option value="pelicula">Ver una película</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileFirstDateOther" style="display:none;">
+
+          <select class="field has-other" id="profileReligion" onchange="toggleOther(this)">
+            <option value="" disabled selected>¿Eres religioso/a?</option>
+            <option value="creo_en_dios">Creo en Dios</option>
+            <option value="activo_iglesia">Activo/a en la iglesia</option>
+            <option value="no_religioso">No soy religioso/a</option>
+            <option value="prefiero_no_decir">Prefiero no decir</option>
+            <option value="otro">Otro</option>
+          </select>
+          <input class="field other-field" type="text" placeholder="Especifica…" id="profileReligionOther" style="display:none;">
+
+          <textarea class="field" placeholder="¿Qué significa la vida para ti? (opcional)" id="profileLifeMeaning" style="resize:none; height:60px; font-family:'Inter',sans-serif;"></textarea>
+
           <div style="margin-bottom:12px;">
             <button type="button" class="btn ghost small" id="locateBtn" onclick="useMyLocation()" style="width:100%; margin-bottom:8px;">📍 Usar mi ubicación actual</button>
             <div id="locationMap" style="width:100%; height:160px; border-radius:12px; border:1px solid var(--navy-line); overflow:hidden; display:none;"></div>
             <p id="locationLabel" style="font-size:12.5px; color:#aab6c9; margin:8px 0 0 0; display:none;"></p>
             <p id="locationError" style="color:#e08a8a; font-size:12px; margin:6px 0 0 0; display:none;"></p>
           </div>
-          <textarea class="field" placeholder="Una breve bio…" id="profileBio" style="resize:none; height:70px; -moz-appearance:none; -webkit-appearance:none; appearance:none; font-family:'Inter',sans-serif;"></textarea>
 
           <div style="display:flex; align-items:center; gap:12px; background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:12px; padding:12px 14px; margin-bottom:12px;">
             <div id="photoPreviewWrap" style="width:44px; height:44px; border-radius:8px; background:rgba(201,161,90,.1); display:flex; align-items:center; justify-content:center; flex:none; overflow:hidden;">
@@ -651,7 +812,6 @@
             <select class="field" id="acctLivingSituation">
               <option value="" disabled selected>Situación de vivienda</option>
               <option value="solo">Vivo solo/a</option>
-              <option value="con_pareja">Vivo con mi pareja</option>
               <option value="con_familia">Vivo con familia</option>
               <option value="con_roommates">Vivo con roommates</option>
               <option value="prefiero_no_decir">Prefiero no decir</option>
@@ -1077,6 +1237,24 @@ async function uploadSelectedPhoto(){
 }
 
 // ---- Profile setup ----
+function toggleOther(selectEl){
+  const otherInput = document.getElementById(selectEl.id + 'Other');
+  if(!otherInput) return;
+  otherInput.style.display = selectEl.value === 'otro' ? 'block' : 'none';
+}
+
+// Resolves a select's value, substituting the free-text "other" field
+// when "otro" was chosen. Returns '' if nothing was picked.
+function resolveFieldValue(selectId){
+  const select = document.getElementById(selectId);
+  if(!select) return '';
+  if(select.value === 'otro'){
+    const other = document.getElementById(selectId + 'Other');
+    return other ? other.value.trim() : '';
+  }
+  return select.value;
+}
+
 async function saveProfile(){
   hideError('profileError');
   const name = document.getElementById('profileName').value.trim();
@@ -1084,10 +1262,62 @@ async function saveProfile(){
   const gender = document.getElementById('profileGender').value;
   const gender_preference = document.getElementById('profileGenderPref').value;
   const bio = document.getElementById('profileBio').value.trim();
+  const occupation = document.getElementById('profileOccupation').value.trim();
+  const interests = document.getElementById('profileInterests').value.trim();
+  const heightVal = document.getElementById('profileHeight').value;
+  const height_cm = heightVal ? Number(heightVal) : null;
 
+  const has_kids = resolveFieldValue('profileHasKids');
+  const has_pets = resolveFieldValue('profileHasPets');
+  const living_situation = resolveFieldValue('profileLivingSituation');
+  const children_preference = resolveFieldValue('profileChildrenPref');
+  const relationship_goals = resolveFieldValue('profileRelationshipGoals');
+  const education = document.getElementById('profileEducation').value; // optional
+  const communication_pref = resolveFieldValue('profileCommunicationPref');
+  const affectionate = resolveFieldValue('profileAffectionate');
+  const zodiac = resolveFieldValue('profileZodiac');
+  const alcohol = resolveFieldValue('profileAlcohol');
+  const smoking = resolveFieldValue('profileSmoking');
+  const social_media_presence = resolveFieldValue('profileSocialMedia');
+  const weekend_style = document.getElementById('profileWeekendStyle').value; // optional
+  const going_out_style = resolveFieldValue('profileGoingOut');
+  const first_date_pref = resolveFieldValue('profileFirstDate');
+  const religion = resolveFieldValue('profileReligion');
+  const life_meaning = document.getElementById('profileLifeMeaning').value.trim(); // optional
+
+  // Basic required fields
   if(!name || !date_of_birth || !gender || !gender_preference){
-    showError('profileError', 'Completa al menos tu nombre, fecha de nacimiento, género y preferencia.');
+    showError('profileError', 'Completa tu nombre, fecha de nacimiento, género y preferencia.');
     return;
+  }
+  if(bio.split(/\s+/).filter(Boolean).length < 2){
+    showError('profileError', 'Tu bio debe tener al menos 2 palabras.');
+    return;
+  }
+  // All the matching-relevant fields are mandatory for this exclusive
+  // matching model, except education, weekend style, and life meaning.
+  const requiredPairs = {
+    'Tienes hijos': has_kids,
+    'Tienes mascotas': has_pets,
+    'Situación de vivienda': living_situation,
+    '¿Quieres más hijos?': children_preference,
+    'Estatura': height_cm,
+    '¿Qué buscas?': relationship_goals,
+    'Comunicación preferida': communication_pref,
+    '¿Eres afectuoso/a?': affectionate,
+    'Signo zodiacal': zodiac,
+    'Alcohol': alcohol,
+    'Fumar': smoking,
+    'Redes sociales': social_media_presence,
+    'Salir con amigos': going_out_style,
+    'Primera cita': first_date_pref,
+    'Religión': religion
+  };
+  for(const [label, val] of Object.entries(requiredPairs)){
+    if(!val){
+      showError('profileError', `Falta completar: ${label}.`);
+      return;
+    }
   }
   if(!currentUserId){
     showError('profileError', 'Falta verificar tu cuenta primero.');
@@ -1108,7 +1338,12 @@ async function saveProfile(){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name, date_of_birth, gender, gender_preference, bio,
-        city: pickedCity, latitude: pickedLat, longitude: pickedLng
+        city: pickedCity, latitude: pickedLat, longitude: pickedLng,
+        occupation, interests, has_kids, has_pets, living_situation,
+        children_preference, height_cm, relationship_goals, education,
+        communication_pref, affectionate, zodiac, alcohol, smoking,
+        social_media_presence, weekend_style, going_out_style,
+        first_date_pref, religion, life_meaning
       })
     });
     const data = await res.json();
