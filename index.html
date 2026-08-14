@@ -850,6 +850,33 @@
           </div>
         </div>
 
+        <!-- Screen: Service tier choice -->
+        <div class="screen" id="sserviceTier">
+          <p class="eyebrow">Último paso</p>
+          <h3>¿Cómo quieres vivir Lanza?</h3>
+          <p class="desc">Ya estás verificado. Ahora elige cómo quieres avanzar.</p>
+
+          <div style="background:linear-gradient(160deg, rgba(230,201,138,.1), rgba(230,201,138,.03)); border:1px solid rgba(246,217,138,.35); border-radius:16px; padding:18px; margin-bottom:14px;">
+            <p class="eyebrow" style="margin-bottom:6px;">Servicio completo</p>
+            <div style="font-family:'Playfair Display',serif; font-size:22px; color:var(--gold-bright); margin-bottom:8px;">RD$300</div>
+            <ul style="margin:0 0 14px 0; padding-left:18px; font-size:12.5px; color:#c7cfdd; line-height:1.7;">
+              <li>Nosotros hacemos el trabajo — sin juegos, sin esperas.</li>
+              <li>Curamos tus matches a mano, no solo un algoritmo.</li>
+              <li>Coordinamos tu primera cita en un lugar público, cuidadosamente elegido.</li>
+              <li>Garantizamos que tu tiempo aquí valga la pena.</li>
+            </ul>
+            <button class="btn primary" onclick="chooseServiceTier('premium')">Unirme al servicio completo</button>
+          </div>
+
+          <div style="border:1px solid var(--navy-line); border-radius:16px; padding:18px; margin-bottom:14px;">
+            <p class="eyebrow" style="margin-bottom:6px;">Solo explorar</p>
+            <p style="font-size:12.5px; color:#aab6c9; line-height:1.6; margin:0 0 14px 0;">Navega perfiles verificados de forma gratuita. Puedes unirte al servicio completo cuando quieras desde tu cuenta.</p>
+            <button class="btn ghost" onclick="chooseServiceTier('free')">Solo navegar por ahora</button>
+          </div>
+
+          <p id="serviceTierError" style="color:#e08a8a; font-size:12px; margin:0; display:none;"></p>
+        </div>
+
         <!-- Screen 7: Swipe deck -->
         <div class="screen" id="s7" style="padding-top:14px;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -1176,7 +1203,7 @@
           <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
             <div class="mark" style="font-size:32px; margin-bottom:6px;">Lanza</div>
             <p style="font-size:13px; color:#aab6c9; max-width:230px; line-height:1.6; margin-bottom:30px;">Un espacio exclusivo para personas que buscan algo real.</p>
-            <button class="btn primary" onclick="restartFlow()">Iniciar sesión</button>
+            <button class="btn primary" onclick="goToSignIn()">Iniciar sesión</button>
           </div>
         </div>
 
@@ -1270,6 +1297,25 @@ function showError(elId, message){
 }
 function hideError(elId){
   document.getElementById(elId).style.display = 'none';
+}
+
+async function chooseServiceTier(tier){
+  const errorEl = document.getElementById('serviceTierError');
+  errorEl.style.display = 'none';
+
+  try {
+    await fetch(`${API_BASE}/api/users/${currentUserId}/service-tier`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tier })
+    });
+  } catch(err){
+    errorEl.textContent = 'No se pudo guardar tu elección, pero puedes continuar — inténtalo de nuevo luego desde tu cuenta.';
+    errorEl.style.display = 'block';
+  }
+
+  goTo(7);
+  loadCandidates();
 }
 
 function acceptConsentAndContinue(){
@@ -1374,7 +1420,19 @@ async function verifyCode(){
     if(!res.ok || !data.verified){
       throw new Error(data.error || 'Código incorrecto. Intenta de nuevo.');
     }
-    goTo(2);
+
+    // Check whether this is a returning user who already finished
+    // identity verification and profile setup — if so, skip straight
+    // to browsing instead of forcing them through onboarding again.
+    const userRes = await fetch(`${API_BASE}/api/users/${currentUserId}`);
+    const userData = await userRes.json();
+
+    if(userRes.ok && userData.identity_verified && userData.profile_complete){
+      goTo(7);
+      loadCandidates();
+    } else {
+      goTo(2);
+    }
   } catch(err){
     showError('otpError', err.message || 'Algo salió mal. Intenta de nuevo.');
   } finally {
@@ -1459,6 +1517,15 @@ async function pollIdentityStatus(){
       console.error('Poll error:', err.message);
     }
   }, 4000);
+}
+
+function goToSignIn(){
+  document.getElementById('phoneInput').value = '';
+  hideError('phoneError');
+  document.getElementById('phoneEntry').style.display = 'block';
+  document.getElementById('otpEntry').style.display = 'none';
+  document.getElementById('phoneDesc').textContent = 'Un número, una cuenta. Te enviaremos un código de verificación.';
+  goTo(1);
 }
 
 function restartFlow(){
@@ -1745,8 +1812,7 @@ async function saveProfile(){
 
     await fetch(`${API_BASE}/api/users/${currentUserId}/complete-profile`, { method: 'POST' });
 
-    goTo(7);
-    loadCandidates();
+    goTo('serviceTier');
   } catch(err){
     showError('profileError', err.message || 'Algo salió mal. Intenta de nuevo.');
   } finally {
