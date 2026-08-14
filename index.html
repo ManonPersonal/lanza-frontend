@@ -334,24 +334,25 @@
   }
   #candidateCard.fly-pass{animation:cardFlyPass .7s cubic-bezier(.3,.6,.6,1) forwards;}
 
-  @keyframes batSwingCenter{
-    0%{transform:translate(-50%,-50%) rotate(70deg);}
-    45%{transform:translate(-50%,-50%) rotate(-15deg);}
-    60%{transform:translate(-50%,-50%) rotate(-15deg);}
-    100%{transform:translate(-50%,-50%) rotate(-15deg); opacity:0;}
+  /* Pass: bat swings in and strikes the bottom-right corner of the
+     candidate's photo itself — the photo acts as the "ball" and flies
+     off to the left. No separate ball icon needed. */
+  @keyframes cardFlyPass{
+    0%{transform:translate(0,0) rotate(0deg); opacity:1;}
+    45%{transform:translate(0,0) rotate(0deg); opacity:1;}
+    100%{transform:translate(-340px,-80px) rotate(-30deg); opacity:0;}
   }
-  @keyframes ballHit{
-    0%,44%{transform:translate(-50%,-50%) scale(1); opacity:1;}
-    100%{transform:translate(-180px,-180px) scale(.6); opacity:0;}
+  #candidateCard.fly-pass{animation:cardFlyPass .7s cubic-bezier(.3,.6,.6,1) forwards;}
+
+  @keyframes batSwingCorner{
+    0%{transform:rotate(90deg) translate(30px, 30px);}
+    45%{transform:rotate(-20deg) translate(-15px, -15px);}
+    60%{transform:rotate(-20deg) translate(-15px, -15px);}
+    100%{transform:rotate(-20deg) translate(-15px, -15px); opacity:0;}
   }
-  .anim-bat-center{
-    position:absolute; left:50%; top:50%; font-size:96px;
-    transform-origin:15% 85%; animation:batSwingCenter .7s ease forwards;
-    z-index:3;
-  }
-  .anim-ball-center{
-    position:absolute; left:50%; top:50%; font-size:52px;
-    animation:ballHit .7s cubic-bezier(.3,.6,.6,1) forwards;
+  .anim-bat-corner{
+    position:absolute; right:-4%; bottom:-2%; font-size:180px;
+    transform-origin:75% 75%; animation:batSwingCorner .7s ease forwards;
     z-index:3;
   }
 
@@ -1906,14 +1907,10 @@ function playSwipeAnimation(direction){
     card.classList.add('fly-pass');
 
     const bat = document.createElement('div');
-    bat.className = 'anim-bat-center';
+    bat.className = 'anim-bat-corner';
     bat.textContent = '🏏';
-    const ball = document.createElement('div');
-    ball.className = 'anim-ball-center';
-    ball.textContent = '⚾';
     area.appendChild(bat);
-    area.appendChild(ball);
-    setTimeout(() => { bat.remove(); ball.remove(); }, 750);
+    setTimeout(() => { bat.remove(); }, 750);
 
   } else if(direction === 'like'){
     card.classList.remove('fly-pass');
