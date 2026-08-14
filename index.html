@@ -496,7 +496,28 @@
             </svg>
           </div>
           <div class="footer-actions">
-            <button class="btn primary" onclick="goTo(1)">Empezar verificación</button>
+            <button class="btn primary" onclick="goTo('consent')">Empezar verificación</button>
+          </div>
+        </div>
+
+        <!-- Screen: Consent -->
+        <div class="screen" id="sconsent">
+          <p class="eyebrow">Antes de continuar</p>
+          <h3>Cómo funciona Lanza</h3>
+          <div style="background:rgba(244,238,225,.05); border:1px solid var(--navy-line); border-radius:14px; padding:16px; margin-bottom:16px; font-size:12.5px; color:#c7cfdd; line-height:1.7;">
+            <p style="margin:0 0 10px 0;"><b style="color:var(--gold-bright);">1. Verificación primero.</b> No puedes ver ni ser visto por otros perfiles hasta completar tu verificación de teléfono, identidad y perfil.</p>
+            <p style="margin:0 0 10px 0;"><b style="color:var(--gold-bright);">2. Los "me gusta" no son instantáneos.</b> Cuando alguien te gusta, le enviamos una notificación — no se abre el chat automáticamente.</p>
+            <p style="margin:0 0 10px 0;"><b style="color:var(--gold-bright);">3. Revisión de compatibilidad.</b> Si esa persona acepta, revisamos automáticamente edad y afinidad antes de confirmar el match.</p>
+            <p style="margin:0;"><b style="color:var(--gold-bright);">4. El chat se desbloquea solo con match confirmado.</b> Si no hay match, ambas personas reciben una notificación clara — nunca quedan sin respuesta.</p>
+          </div>
+          <label style="display:flex; align-items:flex-start; gap:10px; margin-bottom:16px; cursor:pointer;">
+            <input type="checkbox" id="consentCheckbox" style="margin-top:3px; accent-color:var(--gold);">
+            <span style="font-size:12px; color:#aab6c9; line-height:1.5;">He leído y acepto cómo funciona Lanza, incluyendo la verificación de identidad y el proceso de match descrito arriba.</span>
+          </label>
+          <input class="field" type="text" placeholder="Escribe tu nombre completo como firma" id="consentSignature">
+          <p id="consentError" style="color:#e08a8a; font-size:12px; margin:-6px 0 12px 0; display:none;"></p>
+          <div class="footer-actions">
+            <button class="btn primary" onclick="acceptConsentAndContinue()">Firmar y continuar</button>
           </div>
         </div>
 
@@ -837,6 +858,10 @@
               <h3 id="swipeTitle" style="margin-bottom:14px;">Personas reales cerca de ti</h3>
             </div>
             <div style="display:flex; gap:8px; flex:none;">
+              <button onclick="openNotificationsScreen()" title="Notificaciones" aria-label="Notificaciones" style="position:relative; background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3 C 8.7 3, 6.5 5.5, 6.5 9 C 6.5 13.5, 5 15, 4 16.5 H 20 C 19 15, 17.5 13.5, 17.5 9 C 17.5 5.5, 15.3 3, 12 3 Z" fill="none" stroke="#f6d98a" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.5 19 C 10 20.2, 11 21, 12 21 C 13 21, 14 20.2, 14.5 19" stroke="#f6d98a" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg>
+                <span id="notifDot" style="display:none; position:absolute; top:8px; right:9px; width:9px; height:9px; border-radius:50%; background:#e08a8a; border:1.5px solid var(--navy-mid);"></span>
+              </button>
               <button onclick="openMatchesScreen()" title="Mis matches" aria-label="Mis matches" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 20 C 6 15, 3 11, 3 7 C 3 3.5, 6.2 1.5, 9 3 C 10.5 3.8, 12 5.8, 12 5.8 C 12 5.8, 13.5 3.8, 15 3 C 17.8 1.5, 21 3.5, 21 7 C 21 11, 18 15, 12 20 Z" fill="#f6d98a"/></svg>
               </button>
@@ -1134,6 +1159,18 @@
           </div>
         </div>
 
+        <!-- Screen 12: Notifications -->
+        <div class="screen" id="s12">
+          <button onclick="goTo(7)" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:20px; padding:7px 14px 7px 10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; margin-bottom:16px; align-self:flex-start;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 5 L8 12 L15 19" stroke="#e6c988" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:12.5px; color:#c7cfdd; letter-spacing:.01em;">Volver a explorar</span>
+          </button>
+          <p class="eyebrow" style="margin:0 0 4px 0;">Bandeja</p>
+          <h3 style="margin-bottom:14px;">Notificaciones</h3>
+          <div id="notifList" style="display:flex; flex-direction:column; gap:10px; flex:1; overflow-y:auto;"></div>
+          <p id="notifEmpty" style="text-align:center; color:#8291a8; font-size:13px; padding:30px 0; display:none;">No tienes notificaciones por ahora.</p>
+        </div>
+
         <!-- Screen 11: Home (after logout / returning visit) -->
         <div class="screen" id="s11">
           <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
@@ -1224,6 +1261,7 @@ const API_BASE = 'https://lanza-backend-0cc2.onrender.com';
 const STRIPE_PUBLISHABLE_KEY = 'pk_test_51U3LAORyDyj0jJXXfvY4WDRV9tOZCy3KmjQ6OcNZ6Z0817o96KbNge51ehEdcqnlFEdrtJNkiQUBvSAijiIHX8vP001dZvCXOR';
 let currentUserId = null;
 let currentPhone = null;
+let pendingConsentSignature = null;
 
 function showError(elId, message){
   const el = document.getElementById(elId);
@@ -1232,6 +1270,24 @@ function showError(elId, message){
 }
 function hideError(elId){
   document.getElementById(elId).style.display = 'none';
+}
+
+function acceptConsentAndContinue(){
+  hideError('consentError');
+  const checked = document.getElementById('consentCheckbox').checked;
+  const signature = document.getElementById('consentSignature').value.trim();
+
+  if(!checked){
+    showError('consentError', 'Debes aceptar cómo funciona Lanza para continuar.');
+    return;
+  }
+  if(signature.split(/\s+/).filter(Boolean).length < 2){
+    showError('consentError', 'Escribe tu nombre completo como firma.');
+    return;
+  }
+
+  pendingConsentSignature = signature;
+  goTo(1);
 }
 
 async function sendCode(){
@@ -1260,6 +1316,16 @@ async function sendCode(){
 
     currentUserId = userData.id;
     currentPhone = phone;
+
+    // Now that we have a real user id, persist the consent they signed
+    // on the previous screen.
+    if(pendingConsentSignature){
+      await fetch(`${API_BASE}/api/users/${currentUserId}/consent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signature: pendingConsentSignature })
+      });
+    }
 
     // 2) Ask the backend to send (or simulate, in dev mode) a code.
     const sendRes = await fetch(`${API_BASE}/api/verify/send`, {
@@ -1707,6 +1773,7 @@ async function loadCandidates(){
     candidates = data.candidates || [];
     candidateIndex = 0;
     renderCandidate();
+    checkUnreadNotifications();
   } catch(err){
     console.error('Load candidates error:', err.message);
   }
@@ -1831,7 +1898,8 @@ async function swipeAction(direction){
       body: JSON.stringify({ to_user_id: c.id, direction })
     });
     const data = await res.json();
-    if(data.matched){
+    if(data.notificationSent){
+      notice.textContent = '💛 Le avisamos que te gusta';
       notice.style.display = 'block';
     }
   } catch(err){
@@ -2063,6 +2131,97 @@ async function saveAccountChanges(){
 }
 
 // ---- Matches & Chat ----
+// ---- Notifications ----
+async function checkUnreadNotifications(){
+  if(!currentUserId) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/notifications`);
+    const data = await res.json();
+    const hasUnread = (data.notifications || []).some(n => !n.read);
+    const dot = document.getElementById('notifDot');
+    if(dot) dot.style.display = hasUnread ? 'block' : 'none';
+  } catch(err){
+    console.error('Check notifications error:', err.message);
+  }
+}
+
+async function openNotificationsScreen(){
+  goTo(12);
+  const list = document.getElementById('notifList');
+  const empty = document.getElementById('notifEmpty');
+  list.innerHTML = '';
+  empty.style.display = 'none';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/notifications`);
+    const data = await res.json();
+    const notifications = data.notifications || [];
+
+    if(notifications.length === 0){
+      empty.style.display = 'block';
+      return;
+    }
+
+    notifications.forEach(n => {
+      const card = document.createElement('div');
+      card.style.cssText = `background:rgba(244,238,225,.05); border:1px solid ${n.read ? 'var(--navy-line)' : 'rgba(246,217,138,.4)'}; border-radius:14px; padding:12px;`;
+
+      const photoHtml = n.other_photo
+        ? `<img src="${n.other_photo}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">`
+        : `<div style="width:40px; height:40px; border-radius:50%; background:var(--navy-mid); display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gold-bright);">👤</div>`;
+
+      let actionsHtml = '';
+      if(n.type === 'like_request' && !n.handled){
+        actionsHtml = `
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button onclick="respondToNotification(${n.id}, false, this)" class="btn ghost small" style="flex:1;">No</button>
+            <button onclick="respondToNotification(${n.id}, true, this)" class="btn primary" style="flex:1; padding:10px 0;">Sí, me interesa</button>
+          </div>`;
+      }
+
+      card.innerHTML = `
+        <div style="display:flex; gap:10px; align-items:flex-start;">
+          ${photoHtml}
+          <div style="flex:1;">
+            <div style="font-size:13px; color:var(--cream); line-height:1.4;">${n.message}</div>
+            <div style="font-size:10.5px; color:#6c7994; margin-top:3px;">${new Date(n.created_at).toLocaleDateString('es-DO', { day:'numeric', month:'short' })}</div>
+          </div>
+        </div>
+        ${actionsHtml}
+      `;
+      list.appendChild(card);
+
+      if(!n.read && n.type !== 'like_request'){
+        fetch(`${API_BASE}/api/notifications/${n.id}/read`, { method: 'POST' });
+      }
+    });
+
+    checkUnreadNotifications();
+  } catch(err){
+    console.error('Load notifications error:', err.message);
+  }
+}
+
+async function respondToNotification(notifId, accepted, btnEl){
+  const card = btnEl.closest('div[style*="border-radius:14px"]');
+  const actionsRow = btnEl.parentElement;
+  actionsRow.innerHTML = '<span style="font-size:12px; color:#8291a8;">Procesando…</span>';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/notifications/${notifId}/respond`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accepted })
+    });
+    const data = await res.json();
+    actionsRow.innerHTML = data.matched
+      ? '<span style="font-size:12px; color:#f6d98a;">✓ ¡Es un match!</span>'
+      : '<span style="font-size:12px; color:#8291a8;">Respuesta enviada.</span>';
+  } catch(err){
+    actionsRow.innerHTML = '<span style="font-size:12px; color:#e08a8a;">Error, intenta de nuevo.</span>';
+  }
+}
+
 async function openMatchesScreen(){
   goTo(9);
   const list = document.getElementById('matchesList');
