@@ -836,12 +836,17 @@
               <p class="eyebrow">Explorar</p>
               <h3 id="swipeTitle" style="margin-bottom:14px;">Personas reales cerca de ti</h3>
             </div>
-            <button onclick="openAccountScreen()" title="Mi cuenta" aria-label="Mi cuenta" style="background:linear-gradient(180deg,var(--gold),#a8823f); border:none; border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none; box-shadow:0 3px 10px rgba(168,130,63,.45);">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="3.6" fill="#0c1830"/>
-                <path d="M5 20 C 5 15.3, 8 12.6, 12 12.6 C 16 12.6, 19 15.3, 19 20" fill="#0c1830"/>
-              </svg>
-            </button>
+            <div style="display:flex; gap:8px; flex:none;">
+              <button onclick="openMatchesScreen()" title="Mis matches" aria-label="Mis matches" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 20 C 6 15, 3 11, 3 7 C 3 3.5, 6.2 1.5, 9 3 C 10.5 3.8, 12 5.8, 12 5.8 C 12 5.8, 13.5 3.8, 15 3 C 17.8 1.5, 21 3.5, 21 7 C 21 11, 18 15, 12 20 Z" fill="#f6d98a"/></svg>
+              </button>
+              <button onclick="openAccountScreen()" title="Mi cuenta" aria-label="Mi cuenta" style="background:linear-gradient(180deg,var(--gold),#a8823f); border:none; border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none; box-shadow:0 3px 10px rgba(168,130,63,.45);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="3.6" fill="#0c1830"/>
+                  <path d="M5 20 C 5 15.3, 8 12.6, 12 12.6 C 16 12.6, 19 15.3, 19 20" fill="#0c1830"/>
+                </svg>
+              </button>
+            </div>
           </div>
           <div id="swipeArea" style="flex:1; display:flex; flex-direction:column; position:relative; overflow:visible;">
             <div id="candidateCard" style="flex:1; border-radius:22px; overflow:hidden; position:relative; background:linear-gradient(160deg, var(--navy-mid), var(--navy-deep)); border:1px solid var(--navy-line); box-shadow:0 18px 40px rgba(0,0,0,.35); display:flex; align-items:flex-end; min-height:340px;">
@@ -905,7 +910,7 @@
           <div id="accountLoading" style="text-align:center; color:#8291a8; font-size:13px; padding:30px 0;">Cargando tu perfil…</div>
 
           <div id="accountContent" style="display:none;">
-            <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
               <div id="accountPhotoWrap" style="width:58px; height:58px; border-radius:50%; overflow:hidden; background:var(--navy-mid); border:1px solid var(--navy-line); flex:none; display:flex; align-items:center; justify-content:center;">
                 <img id="accountPhoto" style="width:100%; height:100%; object-fit:cover; display:none;">
                 <span id="accountPhotoFallback" style="font-size:20px; color:var(--gold-bright);">👤</span>
@@ -916,6 +921,18 @@
               </div>
             </div>
 
+            <button onclick="openMatchesScreen()" class="btn ghost small" style="width:100%; margin-bottom:18px; display:flex; align-items:center; justify-content:center; gap:6px;">💛 Ver mis matches</button>
+
+            <p class="eyebrow" style="margin-top:6px;">Tus fotos</p>
+            <div id="acctPhotoGallery" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"></div>
+            <div style="display:flex; gap:9px; margin-bottom:16px;">
+              <label for="acctPhotoCamera" class="btn ghost small" style="flex:1; text-align:center; display:block; cursor:pointer;">📷 Tomar foto</label>
+              <label for="acctPhotoGalleryInput" class="btn ghost small" style="flex:1; text-align:center; display:block; cursor:pointer;">🖼️ Galería</label>
+            </div>
+            <input type="file" accept="image/*" capture="user" id="acctPhotoCamera" style="display:none;" onchange="handleAccountPhotoAdd(event)">
+            <input type="file" accept="image/*" id="acctPhotoGalleryInput" style="display:none;" onchange="handleAccountPhotoAdd(event)">
+            <p id="acctPhotoStatus" style="font-size:12px; color:#aab6c9; margin:-6px 0 14px 0; display:none;"></p>
+
             <p class="eyebrow" style="margin-top:6px;">Editar perfil</p>
             <input class="field" type="text" placeholder="Tu nombre" id="acctName">
             <select class="field" id="acctGenderPref">
@@ -925,25 +942,160 @@
             </select>
             <textarea class="field" placeholder="Tu bio…" id="acctBio" style="resize:none; height:70px;"></textarea>
             <input class="field" type="text" placeholder="¿A qué te dedicas?" id="acctOccupation">
-            <input class="field" type="text" placeholder="Tus intereses (ej. senderismo, cocina, música)" id="acctInterests">
-            <select class="field" id="acctHasKids">
+            <p style="font-size:10.5px; color:#6c7994; margin:-8px 0 12px 2px;">Uso interno — no se muestra en tu perfil público.</p>
+            <input class="field" type="text" placeholder="Tus intereses" id="acctInterests">
+            <input class="field" type="number" placeholder="Estatura (cm)" id="acctHeight" min="120" max="230">
+
+            <select class="field has-other" id="acctHasKids" onchange="toggleOther(this)">
               <option value="" disabled selected>¿Tienes hijos?</option>
               <option value="si">Sí</option>
               <option value="no">No</option>
               <option value="prefiero_no_decir">Prefiero no decir</option>
+              <option value="otro">Otro</option>
             </select>
-            <select class="field" id="acctHasPets">
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctHasKidsOther" style="display:none;">
+
+            <select class="field has-other" id="acctChildrenPref" onchange="toggleOther(this)">
+              <option value="" disabled selected>¿Quieres más hijos?</option>
+              <option value="mas_hijos">Sí, quiero más hijos</option>
+              <option value="no_mas_hijos">No quiero más hijos</option>
+              <option value="no_seguro">No estoy seguro/a</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctChildrenPrefOther" style="display:none;">
+
+            <select class="field has-other" id="acctHasPets" onchange="toggleOther(this)">
               <option value="" disabled selected>¿Tienes mascotas?</option>
               <option value="si">Sí</option>
               <option value="no">No</option>
+              <option value="otro">Otro</option>
             </select>
-            <select class="field" id="acctLivingSituation">
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctHasPetsOther" style="display:none;">
+
+            <select class="field has-other" id="acctLivingSituation" onchange="toggleOther(this)">
               <option value="" disabled selected>Situación de vivienda</option>
               <option value="solo">Vivo solo/a</option>
               <option value="con_familia">Vivo con familia</option>
               <option value="con_roommates">Vivo con roommates</option>
               <option value="prefiero_no_decir">Prefiero no decir</option>
+              <option value="otro">Otro</option>
             </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctLivingSituationOther" style="display:none;">
+
+            <select class="field has-other" id="acctRelationshipGoals" onchange="toggleOther(this)">
+              <option value="" disabled selected>¿Qué buscas?</option>
+              <option value="tired_of_games">Cansado/a de los juegos</option>
+              <option value="long_term">Pareja a largo plazo</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctRelationshipGoalsOther" style="display:none;">
+
+            <select class="field" id="acctEducation">
+              <option value="" selected>Educación (opcional)</option>
+              <option value="secundaria">Secundaria</option>
+              <option value="universidad">Universidad</option>
+              <option value="posgrado">Posgrado</option>
+              <option value="otro">Otro</option>
+            </select>
+
+            <select class="field has-other" id="acctCommunicationPref" onchange="toggleOther(this)">
+              <option value="" disabled selected>¿Cómo prefieres comunicarte?</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="redes_sociales">Redes sociales</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctCommunicationPrefOther" style="display:none;">
+
+            <select class="field has-other" id="acctAffectionate" onchange="toggleOther(this)">
+              <option value="" disabled selected>¿Eres una persona afectuosa?</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+              <option value="no_se">No lo sé</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctAffectionateOther" style="display:none;">
+
+            <select class="field has-other" id="acctZodiac" onchange="toggleOther(this)">
+              <option value="" disabled selected>Signo zodiacal</option>
+              <option value="aries">Aries</option><option value="tauro">Tauro</option>
+              <option value="geminis">Géminis</option><option value="cancer">Cáncer</option>
+              <option value="leo">Leo</option><option value="virgo">Virgo</option>
+              <option value="libra">Libra</option><option value="escorpio">Escorpio</option>
+              <option value="sagitario">Sagitario</option><option value="capricornio">Capricornio</option>
+              <option value="acuario">Acuario</option><option value="piscis">Piscis</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctZodiacOther" style="display:none;">
+
+            <select class="field has-other" id="acctAlcohol" onchange="toggleOther(this)">
+              <option value="" disabled selected>¿Consumes alcohol?</option>
+              <option value="una_copa_diaria">Una copa al día</option>
+              <option value="socialmente">Socialmente</option>
+              <option value="no_bebo">No bebo alcohol</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctAlcoholOther" style="display:none;">
+
+            <select class="field has-other" id="acctSmoking" onchange="toggleOther(this)">
+              <option value="" disabled selected>¿Fumas?</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+              <option value="no_fumo">No fumo</option>
+              <option value="socialmente">Socialmente</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctSmokingOther" style="display:none;">
+
+            <select class="field has-other" id="acctSocialMedia" onchange="toggleOther(this)">
+              <option value="" disabled selected>Presencia en redes sociales</option>
+              <option value="si">Sí, activo/a</option>
+              <option value="no">No tengo</option>
+              <option value="solo_scroll">Solo para ver, no publico</option>
+              <option value="poco_activo">Poco activo/a</option>
+              <option value="fuera_de_la_red">Fuera de la red por completo</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctSocialMediaOther" style="display:none;">
+
+            <select class="field" id="acctWeekendStyle">
+              <option value="" selected>¿Cómo son tus fines de semana? (opcional)</option>
+              <option value="activo">Activos y llenos de planes</option>
+              <option value="tranquilo">Tranquilos y relajados</option>
+              <option value="mixto">Un poco de ambos</option>
+              <option value="otro">Otro</option>
+            </select>
+
+            <select class="field has-other" id="acctGoingOut" onchange="toggleOther(this)">
+              <option value="" disabled selected>Salir con amigos</option>
+              <option value="grupo_grande">Tengo un grupo grande de amigos</option>
+              <option value="circulo_pequeno">Tengo un círculo pequeño y cercano</option>
+              <option value="prefiero_casa">Prefiero quedarme en casa viendo TV</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctGoingOutOther" style="display:none;">
+
+            <select class="field has-other" id="acctFirstDate" onchange="toggleOther(this)">
+              <option value="" disabled selected>Tu primera cita ideal</option>
+              <option value="paseo_malecon">Un paseo por el malecón</option>
+              <option value="tomar_algo">Tomar algo</option>
+              <option value="encuentro_rapido">Un encuentro rápido para conocernos</option>
+              <option value="pelicula">Ver una película</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctFirstDateOther" style="display:none;">
+
+            <select class="field has-other" id="acctReligion" onchange="toggleOther(this)">
+              <option value="" disabled selected>¿Eres religioso/a?</option>
+              <option value="creo_en_dios">Creo en Dios</option>
+              <option value="activo_iglesia">Activo/a en la iglesia</option>
+              <option value="no_religioso">No soy religioso/a</option>
+              <option value="prefiero_no_decir">Prefiero no decir</option>
+              <option value="otro">Otro</option>
+            </select>
+            <input class="field other-field" type="text" placeholder="Especifica…" id="acctReligionOther" style="display:none;">
+
+            <textarea class="field" placeholder="¿Qué significa la vida para ti? (opcional)" id="acctLifeMeaning" style="resize:none; height:80px;"></textarea>
+
             <button type="button" class="btn ghost small" onclick="useMyLocation()" style="width:100%; margin-bottom:8px;">📍 Actualizar mi ubicación</button>
             <p id="acctLocationLabel" style="font-size:12px; color:#aab6c9; margin:0 0 12px 0;"></p>
             <p id="acctError" style="color:#e08a8a; font-size:12px; margin:-6px 0 12px 0; display:none;"></p>
@@ -952,6 +1104,42 @@
             <div style="margin-top:24px; padding-top:18px; border-top:1px solid var(--navy-line);">
               <button class="btn ghost" style="width:100%; color:#e08a8a; border-color:rgba(224,138,138,.3);" onclick="logOut()">Cerrar sesión</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Screen 9: Matches list -->
+        <div class="screen" id="s9">
+          <button onclick="goTo(7)" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:20px; padding:7px 14px 7px 10px; display:inline-flex; align-items:center; gap:6px; cursor:pointer; margin-bottom:16px; align-self:flex-start;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 5 L8 12 L15 19" stroke="#e6c988" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font-size:12.5px; color:#c7cfdd; letter-spacing:.01em;">Volver a explorar</span>
+          </button>
+          <p class="eyebrow" style="margin:0 0 4px 0;">Tus conexiones</p>
+          <h3 style="margin-bottom:14px;">Mis matches</h3>
+          <div id="matchesList" style="display:flex; flex-direction:column; gap:10px; flex:1; overflow-y:auto;"></div>
+          <p id="matchesEmpty" style="text-align:center; color:#8291a8; font-size:13px; padding:30px 0; display:none;">Todavía no tienes matches.<br><span style="font-size:11.5px; color:#6c7994;">Cuando le gustes a alguien que también te gustó, aparecerá aquí.</span></p>
+        </div>
+
+        <!-- Screen 10: Chat -->
+        <div class="screen" id="s10">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+            <button onclick="goTo(9)" style="background:rgba(244,238,225,.06); border:1px solid var(--navy-line); border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex:none;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M15 5 L8 12 L15 19" stroke="#e6c988" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div id="chatWithName" style="font-family:'Playfair Display',serif; font-size:17px; color:var(--cream);"></div>
+          </div>
+          <div id="chatMessages" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 0 10px 0;"></div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input class="field" type="text" placeholder="Escribe un mensaje…" id="chatInput" style="margin-bottom:0; flex:1;" onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button class="btn primary" style="width:auto; padding:14px 18px; margin-bottom:0;" onclick="sendChatMessage()">➤</button>
+          </div>
+        </div>
+
+        <!-- Screen 11: Home (after logout / returning visit) -->
+        <div class="screen" id="s11">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+            <div class="mark" style="font-size:32px; margin-bottom:6px;">Lanza</div>
+            <p style="font-size:13px; color:#aab6c9; max-width:230px; line-height:1.6; margin-bottom:30px;">Un espacio exclusivo para personas que buscan algo real.</p>
+            <button class="btn primary" onclick="restartFlow()">Iniciar sesión</button>
           </div>
         </div>
 
@@ -1658,6 +1846,30 @@ async function swipeAction(direction){
 }
 
 // ---- Account / Settings ----
+const ACCT_SELECT_IDS = [
+  'acctHasKids', 'acctChildrenPref', 'acctHasPets', 'acctLivingSituation',
+  'acctRelationshipGoals', 'acctCommunicationPref', 'acctAffectionate',
+  'acctZodiac', 'acctAlcohol', 'acctSmoking', 'acctSocialMedia',
+  'acctGoingOut', 'acctFirstDate', 'acctReligion'
+];
+
+function setSelectOrOther(selectId, value){
+  const select = document.getElementById(selectId);
+  const other = document.getElementById(selectId + 'Other');
+  if(!select) return;
+  const optionExists = [...select.options].some(o => o.value === value);
+  if(!value){
+    select.value = '';
+  } else if(optionExists){
+    select.value = value;
+    if(other) other.style.display = 'none';
+  } else {
+    // Value doesn't match a known option, so it must be a saved "other" answer.
+    select.value = 'otro';
+    if(other){ other.value = value; other.style.display = 'block'; }
+  }
+}
+
 async function openAccountScreen(){
   goTo(8);
   document.getElementById('accountLoading').style.display = 'block';
@@ -1675,28 +1887,34 @@ async function openAccountScreen(){
     document.getElementById('acctBio').value = data.bio || '';
     document.getElementById('acctOccupation').value = data.occupation || '';
     document.getElementById('acctInterests').value = data.interests || '';
-    document.getElementById('acctHasKids').value = data.has_kids || '';
-    document.getElementById('acctHasPets').value = data.has_pets || '';
-    document.getElementById('acctLivingSituation').value = data.living_situation || '';
+    document.getElementById('acctHeight').value = data.height_cm || '';
+    document.getElementById('acctEducation').value = data.education || '';
+    document.getElementById('acctWeekendStyle').value = data.weekend_style || '';
+    document.getElementById('acctLifeMeaning').value = data.life_meaning || '';
+
+    setSelectOrOther('acctHasKids', data.has_kids);
+    setSelectOrOther('acctChildrenPref', data.children_preference);
+    setSelectOrOther('acctHasPets', data.has_pets);
+    setSelectOrOther('acctLivingSituation', data.living_situation);
+    setSelectOrOther('acctRelationshipGoals', data.relationship_goals);
+    setSelectOrOther('acctCommunicationPref', data.communication_pref);
+    setSelectOrOther('acctAffectionate', data.affectionate);
+    setSelectOrOther('acctZodiac', data.zodiac);
+    setSelectOrOther('acctAlcohol', data.alcohol);
+    setSelectOrOther('acctSmoking', data.smoking);
+    setSelectOrOther('acctSocialMedia', data.social_media_presence);
+    setSelectOrOther('acctGoingOut', data.going_out_style);
+    setSelectOrOther('acctFirstDate', data.first_date_pref);
+    setSelectOrOther('acctReligion', data.religion);
+
     document.getElementById('acctLocationLabel').textContent = data.city ? `📍 ${data.city}` : 'Ubicación no configurada';
 
     const badge = document.getElementById('accountVerifiedLine');
     badge.textContent = data.identity_verified ? '✓ Identidad verificada' : 'Identidad pendiente de verificación';
-    badge.style.color = data.identity_verified ? 'var(--gold-bright)' : '#8291a8';
+    badge.style.color = data.identity_verified ? '#f6d98a' : '#8291a8';
 
-    const photo = document.getElementById('accountPhoto');
-    const fallback = document.getElementById('accountPhotoFallback');
-    if(data.photos && data.photos.length){
-      photo.src = data.photos[0].url;
-      photo.style.display = 'block';
-      fallback.style.display = 'none';
-    } else {
-      photo.style.display = 'none';
-      fallback.style.display = 'block';
-    }
+    renderAccountPhotos(data.photos || []);
 
-    // Keep the shared location state in sync so "Actualizar mi ubicación"
-    // and saving reuse the same real coordinates as the profile screen.
     if(data.latitude && data.longitude){
       pickedLat = data.latitude;
       pickedLng = data.longitude;
@@ -1710,17 +1928,80 @@ async function openAccountScreen(){
   }
 }
 
+function renderAccountPhotos(photos){
+  const photo = document.getElementById('accountPhoto');
+  const fallback = document.getElementById('accountPhotoFallback');
+  if(photos.length){
+    photo.src = photos[0].url;
+    photo.style.display = 'block';
+    fallback.style.display = 'none';
+  } else {
+    photo.style.display = 'none';
+    fallback.style.display = 'block';
+  }
+
+  const gallery = document.getElementById('acctPhotoGallery');
+  gallery.innerHTML = '';
+  photos.forEach(p => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative; width:64px; height:64px;';
+    wrap.innerHTML = `
+      <img src="${p.url}" style="width:100%; height:100%; object-fit:cover; border-radius:10px; border:1px solid var(--navy-line);">
+      <button onclick="deleteAccountPhoto(${p.id})" title="Eliminar" style="position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:#0c1830; border:1px solid rgba(224,138,138,.5); color:#e08a8a; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+    `;
+    gallery.appendChild(wrap);
+  });
+}
+
+async function handleAccountPhotoAdd(event){
+  const file = event.target.files[0];
+  if(!file || !currentUserId) return;
+
+  const statusEl = document.getElementById('acctPhotoStatus');
+  statusEl.style.display = 'block';
+  statusEl.textContent = 'Subiendo foto…';
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST', body: formData
+    });
+    const uploadData = await uploadRes.json();
+    if(!uploadRes.ok) throw new Error(uploadData.error?.message || 'No se pudo subir la foto.');
+
+    await fetch(`${API_BASE}/api/users/${currentUserId}/photos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: uploadData.secure_url })
+    });
+
+    const userRes = await fetch(`${API_BASE}/api/users/${currentUserId}`);
+    const userData = await userRes.json();
+    renderAccountPhotos(userData.photos || []);
+    statusEl.textContent = '✓ Foto añadida';
+    setTimeout(() => { statusEl.style.display = 'none'; }, 1500);
+  } catch(err){
+    statusEl.textContent = err.message || 'No se pudo subir la foto.';
+  }
+  event.target.value = '';
+}
+
+async function deleteAccountPhoto(photoId){
+  try {
+    await fetch(`${API_BASE}/api/photos/${photoId}`, { method: 'DELETE' });
+    const userRes = await fetch(`${API_BASE}/api/users/${currentUserId}`);
+    const userData = await userRes.json();
+    renderAccountPhotos(userData.photos || []);
+  } catch(err){
+    console.error('Delete photo error:', err.message);
+  }
+}
+
 async function saveAccountChanges(){
   hideError('acctError');
   const name = document.getElementById('acctName').value.trim();
-  const gender_preference = document.getElementById('acctGenderPref').value;
-  const bio = document.getElementById('acctBio').value.trim();
-  const occupation = document.getElementById('acctOccupation').value.trim();
-  const interests = document.getElementById('acctInterests').value.trim();
-  const has_kids = document.getElementById('acctHasKids').value;
-  const has_pets = document.getElementById('acctHasPets').value;
-  const living_situation = document.getElementById('acctLivingSituation').value;
-
   if(!name){
     showError('acctError', 'Tu nombre no puede quedar vacío.');
     return;
@@ -1731,7 +2012,31 @@ async function saveAccountChanges(){
   btn.textContent = 'Guardando…';
 
   try {
-    const body = { name, gender_preference, bio, occupation, interests, has_kids, has_pets, living_situation };
+    const body = {
+      name,
+      gender_preference: document.getElementById('acctGenderPref').value,
+      bio: document.getElementById('acctBio').value.trim(),
+      occupation: document.getElementById('acctOccupation').value.trim(),
+      interests: document.getElementById('acctInterests').value.trim(),
+      height_cm: document.getElementById('acctHeight').value ? Number(document.getElementById('acctHeight').value) : null,
+      education: document.getElementById('acctEducation').value,
+      weekend_style: document.getElementById('acctWeekendStyle').value,
+      life_meaning: document.getElementById('acctLifeMeaning').value.trim(),
+      has_kids: resolveFieldValue('acctHasKids'),
+      children_preference: resolveFieldValue('acctChildrenPref'),
+      has_pets: resolveFieldValue('acctHasPets'),
+      living_situation: resolveFieldValue('acctLivingSituation'),
+      relationship_goals: resolveFieldValue('acctRelationshipGoals'),
+      communication_pref: resolveFieldValue('acctCommunicationPref'),
+      affectionate: resolveFieldValue('acctAffectionate'),
+      zodiac: resolveFieldValue('acctZodiac'),
+      alcohol: resolveFieldValue('acctAlcohol'),
+      smoking: resolveFieldValue('acctSmoking'),
+      social_media_presence: resolveFieldValue('acctSocialMedia'),
+      going_out_style: resolveFieldValue('acctGoingOut'),
+      first_date_pref: resolveFieldValue('acctFirstDate'),
+      religion: resolveFieldValue('acctReligion')
+    };
     if(pickedLat && pickedLng){
       body.latitude = pickedLat;
       body.longitude = pickedLng;
@@ -1757,6 +2062,96 @@ async function saveAccountChanges(){
   }
 }
 
+// ---- Matches & Chat ----
+async function openMatchesScreen(){
+  goTo(9);
+  const list = document.getElementById('matchesList');
+  const empty = document.getElementById('matchesEmpty');
+  list.innerHTML = '';
+  empty.style.display = 'none';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/users/${currentUserId}/matches`);
+    const data = await res.json();
+    const matches = data.matches || [];
+
+    if(matches.length === 0){
+      empty.style.display = 'block';
+      return;
+    }
+
+    matches.forEach(m => {
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex; align-items:center; gap:12px; background:rgba(244,238,225,.05); border:1px solid var(--navy-line); border-radius:14px; padding:10px; cursor:pointer;';
+      row.onclick = () => openChatScreen(m.match_id, m.user.name);
+      const photoHtml = m.user.photo
+        ? `<img src="${m.user.photo}" style="width:48px; height:48px; border-radius:50%; object-fit:cover;">`
+        : `<div style="width:48px; height:48px; border-radius:50%; background:var(--navy-mid); display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--gold-bright);">👤</div>`;
+      const lastMsg = m.last_message ? m.last_message.body : 'Di hola 👋';
+      row.innerHTML = `
+        ${photoHtml}
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:'Playfair Display',serif; font-size:15px; color:var(--cream);">${m.user.name || 'Sin nombre'}</div>
+          <div style="font-size:12px; color:#8291a8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${lastMsg}</div>
+        </div>
+      `;
+      list.appendChild(row);
+    });
+  } catch(err){
+    console.error('Load matches error:', err.message);
+  }
+}
+
+let currentChatMatchId = null;
+let chatPollTimer = null;
+
+async function openChatScreen(matchId, otherName){
+  currentChatMatchId = matchId;
+  document.getElementById('chatWithName').textContent = otherName || 'Chat';
+  goTo(10);
+  await loadChatMessages();
+  clearInterval(chatPollTimer);
+  chatPollTimer = setInterval(loadChatMessages, 4000);
+}
+
+async function loadChatMessages(){
+  if(!currentChatMatchId) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/matches/${currentChatMatchId}/messages?user_id=${currentUserId}`);
+    const data = await res.json();
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '';
+    (data.messages || []).forEach(m => {
+      const mine = String(m.sender_id) === String(currentUserId);
+      const bubble = document.createElement('div');
+      bubble.style.cssText = `max-width:75%; padding:9px 13px; border-radius:14px; font-size:13.5px; line-height:1.4; align-self:${mine ? 'flex-end' : 'flex-start'}; background:${mine ? 'linear-gradient(180deg,var(--gold-bright),var(--gold))' : 'rgba(244,238,225,.08)'}; color:${mine ? '#1c1608' : 'var(--cream)'};`;
+      bubble.textContent = m.body;
+      container.appendChild(bubble);
+    });
+    container.scrollTop = container.scrollHeight;
+  } catch(err){
+    console.error('Load messages error:', err.message);
+  }
+}
+
+async function sendChatMessage(){
+  const input = document.getElementById('chatInput');
+  const body = input.value.trim();
+  if(!body || !currentChatMatchId) return;
+  input.value = '';
+
+  try {
+    await fetch(`${API_BASE}/api/matches/${currentChatMatchId}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sender_id: currentUserId, body })
+    });
+    await loadChatMessages();
+  } catch(err){
+    console.error('Send message error:', err.message);
+  }
+}
+
 function logOut(){
   currentUserId = null;
   currentPhone = null;
@@ -1765,7 +2160,9 @@ function logOut(){
   pickedLat = null;
   pickedLng = null;
   pickedCity = '';
-  restartFlow();
+  clearInterval(identityPollTimer);
+  clearInterval(chatPollTimer);
+  goTo(11);
 }
 
 setProgress(0);
