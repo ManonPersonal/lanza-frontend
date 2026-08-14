@@ -331,19 +331,19 @@
   @keyframes cardFlyPass{
     0%{transform:translate(0,0) rotate(0deg); opacity:1;}
     44%{transform:translate(0,0) rotate(0deg); opacity:1;}
-    100%{transform:translate(-360px,-60px) rotate(-540deg); opacity:0;}
+    100%{transform:translate(-380px,-40px) rotate(-1080deg); opacity:0;}
   }
-  #candidateCard.fly-pass{animation:cardFlyPass .8s cubic-bezier(.3,.6,.6,1) forwards;}
+  #candidateCard.fly-pass{animation:cardFlyPass .85s cubic-bezier(.3,.6,.6,1) forwards;}
 
   @keyframes batSwingCorner{
-    0%{transform:rotate(-75deg) translate(18px, 26px); opacity:1;}
-    44%{transform:rotate(20deg) translate(-6px, -8px); opacity:1;}
-    60%{transform:rotate(20deg) translate(-6px, -8px); opacity:1;}
-    100%{transform:rotate(20deg) translate(-6px, -8px); opacity:0;}
+    0%{transform:rotate(-95deg) translate(4px, -50px); opacity:1;}
+    44%{transform:rotate(18deg) translate(-4px, -6px); opacity:1;}
+    60%{transform:rotate(18deg) translate(-4px, -6px); opacity:1;}
+    100%{transform:rotate(18deg) translate(-4px, -6px); opacity:0;}
   }
   .anim-bat-corner{
-    position:absolute; right:-6%; bottom:-4%; width:150px; height:180px;
-    transform-origin:82% 86%; animation:batSwingCorner .8s ease forwards;
+    position:absolute; right:-2%; bottom:-2%; width:110px; height:210px;
+    transform-origin:78% 90%; animation:batSwingCorner .85s ease forwards;
     z-index:3; pointer-events:none;
   }
 
@@ -1900,47 +1900,47 @@ function playSwipeAnimation(direction){
     const bat = document.createElement('div');
     bat.className = 'anim-bat-corner';
     bat.innerHTML = `
-      <svg width="180" height="220" viewBox="0 0 180 220" xmlns="http://www.w3.org/2000/svg">
+      <svg width="110" height="210" viewBox="0 0 110 210" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="batHandleWood" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#8a6438"/>
-            <stop offset="50%" stop-color="#c99a5e"/>
-            <stop offset="100%" stop-color="#8a6438"/>
+            <stop offset="0%" stop-color="#6e5230"/>
+            <stop offset="50%" stop-color="#93744a"/>
+            <stop offset="100%" stop-color="#6e5230"/>
           </linearGradient>
           <linearGradient id="batBlue" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#1a3f7a"/>
-            <stop offset="50%" stop-color="#2f5ea8"/>
-            <stop offset="100%" stop-color="#1a3f7a"/>
+            <stop offset="0%" stop-color="#233d5e"/>
+            <stop offset="50%" stop-color="#33507a"/>
+            <stop offset="100%" stop-color="#233d5e"/>
           </linearGradient>
           <linearGradient id="batRed" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#8f1d1d"/>
-            <stop offset="50%" stop-color="#c92e2e"/>
-            <stop offset="100%" stop-color="#8f1d1d"/>
+            <stop offset="0%" stop-color="#6e2b2b"/>
+            <stop offset="50%" stop-color="#8f3d3d"/>
+            <stop offset="100%" stop-color="#6e2b2b"/>
           </linearGradient>
           <linearGradient id="batWhite" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#d9dde3"/>
-            <stop offset="50%" stop-color="#f5f6f8"/>
-            <stop offset="100%" stop-color="#d9dde3"/>
+            <stop offset="0%" stop-color="#a8a9ad"/>
+            <stop offset="50%" stop-color="#c7c8cc"/>
+            <stop offset="100%" stop-color="#a8a9ad"/>
           </linearGradient>
         </defs>
-        <!-- straight bat, barrel at top, tapering to a longer handle at bottom -->
+        <!-- thin, elongated bat: barrel at top, tapering to a long handle -->
         <g>
-          <!-- barrel: blue / white / red bands, nearly straight sides -->
-          <path d="M76 6 L104 6 L106 62 L74 62 Z" fill="url(#batBlue)" stroke="#0d2246" stroke-width="1.2"/>
-          <path d="M74 62 L106 62 L107 90 L73 90 Z" fill="url(#batWhite)" stroke="#9aa0a8" stroke-width="1.2"/>
-          <path d="M73 90 L107 90 L104 122 L76 122 Z" fill="url(#batRed)" stroke="#5c1212" stroke-width="1.2"/>
+          <!-- barrel: muted blue / white / red bands, slender profile -->
+          <path d="M48 4 L62 4 L63 58 L47 58 Z" fill="url(#batBlue)" stroke="#182a42" stroke-width="1"/>
+          <path d="M47 58 L63 58 L63.5 86 L46.5 86 Z" fill="url(#batWhite)" stroke="#7d7e82" stroke-width="1"/>
+          <path d="M46.5 86 L63.5 86 L61 118 L49 118 Z" fill="url(#batRed)" stroke="#471d1d" stroke-width="1"/>
           <!-- taper into the neck -->
-          <path d="M76 122 L104 122 L96 150 L84 150 Z" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
-          <!-- longer handle -->
-          <rect x="84" y="150" width="12" height="52" rx="4" fill="url(#batHandleWood)" stroke="#5c3e1c" stroke-width="1.2"/>
+          <path d="M49 118 L61 118 L57 146 L53 146 Z" fill="url(#batHandleWood)" stroke="#4a3820" stroke-width="1"/>
+          <!-- long, thin handle -->
+          <rect x="52" y="146" width="6" height="56" rx="3" fill="url(#batHandleWood)" stroke="#4a3820" stroke-width="1"/>
           <!-- knob at the end -->
-          <ellipse cx="90" cy="208" rx="9" ry="5" fill="#6b4a24" stroke="#4a3218" stroke-width="1.2"/>
+          <ellipse cx="55" cy="204" rx="6" ry="3.5" fill="#5a4020" stroke="#3d2c16" stroke-width="1"/>
           <!-- grip tape wraps -->
-          <path d="M84 156 L96 156 M84 166 L96 166 M84 176 L96 176 M84 186 L96 186 M84 196 L96 196" stroke="#4a3218" stroke-width="1.6"/>
+          <path d="M52 152 L58 152 M52 160 L58 160 M52 168 L58 168 M52 176 L58 176 M52 184 L58 184 M52 192 L58 192" stroke="#3d2c16" stroke-width="1.2"/>
         </g>
       </svg>`;
     area.appendChild(bat);
-    setTimeout(() => { bat.remove(); }, 850);
+    setTimeout(() => { bat.remove(); }, 900);
 
   } else if(direction === 'like'){
     card.classList.remove('fly-pass');
@@ -2015,7 +2015,7 @@ async function swipeAction(direction){
     console.error('Swipe error:', err.message);
   }
 
-  const animDelay = direction === 'maybe' ? 900 : (direction === 'pass' ? 850 : 700);
+  const animDelay = direction === 'maybe' ? 900 : (direction === 'pass' ? 900 : 700);
   setTimeout(() => {
     candidateIndex += 1;
     renderCandidate();
